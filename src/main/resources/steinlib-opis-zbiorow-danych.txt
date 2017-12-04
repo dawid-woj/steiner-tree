@@ -1,0 +1,153 @@
+Steinlib graph files format - STP files
+
+http://steinlib.zib.de/steinlib.php
+
+------------------------------------------------------
+
+Format plikow STP ponizszych zbiorow:
+
+33D32945 STP File, STP Format Version 1.0
+
+SECTION Comment
+Name "nazwa"
+Creator "kto stworzyl"
+Remark "komentarz"
+END
+
+SECTION Graph
+Nodes <liczba_wierzcholkow>
+Edges <liczba_krawedzi>
+E <numer_wierzcholka_pierwszego> <numer_wierzcholka_drugiego> <koszt_krawedzi>
+E ...
+END
+
+SECTION Terminals
+Terminals <liczba_wierzcholkow_terminalnych>
+T <numer_wierzcholka>
+T ...
+END
+
+SECTION Coordinates
+DD <numer_wierzcholka> <wspolrzedna_x> <wspolrzedna_y>
+DD ...
+END
+
+EOF
+
+------------------------------------------------------
+
+sekcja "Coordinates" wystepuje tylko dla zbiorow MC i X
+
+------------------------------------------------------
+
+przykladowy pythonowy parser plikow STP: https://github.com/leandron/steinlib
+
+------------------------------------------------------
+
+wybrane zbiory (ze statusem dead -> "There are various publications where these instances are solved"):
+
+B	- 18 problemów,		50-100 wierzcho³ków,	grafy rzadkie z losowymi wagami
+C	- 20 problemów,		500 wierzcho³ków,		grafy rzadkie z losowymi wagami
+D	- 20 problemów, 	1000 wierzcho³ków,		grafy rzadkie z losowymi wagami
+E	- 20 problemów,		2500 wierzcho³ków,		grafy rzadkie z losowymi wagami
+MC	- 6 problemów,		400 wierzcho³ków,		grafy rzadkie i pe³ne
+X	- 3 problemy,		666 wierzcho³ków,		grafy zupe³ne z euklidesowymi wagami
+P4E - 11 problemów, 	100-200 wierzcho³ków,	grafy zupe³ne z euklidesowymi wagami
+P4Z - 10 problemów, 	100 wierzcho³ków,		grafy zupe³ne z losowymi wagami
+P6E - 15 problemów, 	100-200 wierzcho³ków,	grafy rzadkie z wagami euklidesowymi
+P6Z - 15 problemów, 	100-200 wierzcho³ków,	grafy rzadkie z losowymi wagami
+
+------------------------------------------------------
+
+- wagi euklidesowe -> to chyba takie, ktore spelniaja nierownosc trojkata
+- wagi wszystkich grafow powyzszych zbiorow sa dodatnie
+- dla wszystkich problemow z powyzszych zbiorow sa podane optymalne rozwiazania (koszty minimalnych drzew steinera)
+
+------------------------------------------------------
+
+stopien trudnosci problemu rosnaco:
+
+1) rozwiazywalne poprzez lokalny preprocessing (L)
+2) rozwiazywalne przez algorytmy w czasie wielomianowym (P)
+3) pozostale (rozwiazywalne wykladniczo lub niewiadomo) (NP, ...) <- w te nie celujemy raczej
+
+------------------------------------------------------
+
+Zbiór B (http://steinlib.zib.de/showset.php?B)
+
+- problemy rozwiazywalne poprzez lokalny preprocessing lub rozwiazywalne przez algorytmy w czasie wielomianowym
+- problemy rozwiazywalne w mniej niz minute przy uzyciu "state-of-the-art soft- and hardware"
+
+------------------------------------------------------
+
+Zbiór C (http://steinlib.zib.de/showset.php?C)
+
+- problemy rozwiazywalne poprzez lokalny preprocessing lub rozwiazywalne przez algorytmy w czasie wielomianowym
+- problemy rozwiazywalne w mniej niz minute przy uzyciu "state-of-the-art soft- and hardware"
+
+------------------------------------------------------
+
+Zbiór D (http://steinlib.zib.de/showset.php?D)
+
+- problemy rozwiazywalne przez algorytmy w czasie wielomianowym (tylko 1 z nich - d20 - jest rozwiazywalny poprzez lokalny preprocessing)
+- wiekszosc problemow rozwiazywalnych w mniej niz minute przy uzyciu "state-of-the-art soft- and hardware"
+  (4 z nich: d11, d12, d16, d17 sa rozwiazywalne w mniej niz godzine)
+
+------------------------------------------------------
+
+Zbiór E (http://steinlib.zib.de/showset.php?E)
+
+- bardziej zroznicowany zbior niz B,C,D:
+	pierwsze 6 problemow (i problem nr 15) jest wielomianowych, rozwiazywlnych w mniej niz minute przy uzyciu "state-of-the-art soft- and hardware"
+	ostatni problem jest najlatwiejszy, rozwiazywalny w mniej niz minute  przy uzyciu "state-of-the-art soft- and hardware"
+	18. problem jest NP, rozwiazywalny w mniej niz dzien przy uzyciu "state-of-the-art soft- and hardware"
+
+------------------------------------------------------
+
+Zbiór MC (http://steinlib.zib.de/showset.php?MC)
+
+- tez calkiem zroznicowane grafy:
+	mc11, mc7, mc8 - problemy wielomianowe, rozwiazywalne w mniej niz minute przy uzyciu "state-of-the-art soft- and hardware"
+	mc2, mc3 - problemy NP rozwiazywalne w mniej niz minute przy uzyciu "state-of-the-art soft- and hardware"
+	mc13 - problem NP rozwiazywalny w mniej niz godzine przy uzyciu "state-of-the-art soft- and hardware"
+
+------------------------------------------------------
+
+Zbiór X (http://steinlib.zib.de/showset.php?X)
+
+berlin52 is made out of 52 sights in Berlin.
+brazil58 are 58 cities in Brazil with the provincial capitals as terminals.
+world666 are 666 cities around the world with the capitals as terminals.
+
+- problemy rozwiazywalne wielomianowo w mniej niz minute przy uzyciu "state-of-the-art soft- and hardware"
+- dane sa optymalne rozwiazania (koszty drzew steinera) dla wszystkich problemow
+
+------------------------------------------------------
+
+Zbiór P4E (http://steinlib.zib.de/showset.php?P4E)
+
+- problemy rozwiazywalne wielomianowo w mniej niz minute przy uzyciu "state-of-the-art soft- and hardware"
+
+------------------------------------------------------
+
+Zbiór P4Z (http://steinlib.zib.de/showset.php?P4Z)
+
+- problemy rozwiazywalne poprzez lokalny preprocessing lub rozwiazywalne przez algorytmy w czasie wielomianowym
+- problemy rozwiazywalne w mniej niz minute przy uzyciu "state-of-the-art soft- and hardware"
+
+------------------------------------------------------
+
+Zbiór P6E (http://steinlib.zib.de/showset.php?P6E)
+
+- problemy rozwiazywalne poprzez lokalny preprocessing lub rozwiazywalne przez algorytmy w czasie wielomianowym
+- problemy rozwiazywalne w mniej niz minute przy uzyciu "state-of-the-art soft- and hardware"
+
+------------------------------------------------------
+
+Zbiór P6Z (http://steinlib.zib.de/showset.php?P6Z)
+
+- pierwszy problem ma pusty zbior terminali!
+- problemy rozwiazywalne poprzez lokalny preprocessing lub rozwiazywalne przez algorytmy w czasie wielomianowym
+- problemy rozwiazywalne w mniej niz minute przy uzyciu "state-of-the-art soft- and hardware"
+
+------------------------------------------------------
