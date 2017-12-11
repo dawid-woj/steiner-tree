@@ -1,8 +1,6 @@
 package pl.edu.pw.elka.gis.steinar.io;
 
-import pl.edu.pw.elka.gis.steinar.SteinerGraph;
-import pl.edu.pw.elka.gis.steinar.model.Graph;
-import scala.Int;
+import pl.edu.pw.elka.gis.steinar.model.SteinerGraph;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -16,18 +14,20 @@ public class STPLoader {
 
     static private final Pattern SECTION_PATTERN = Pattern.compile("SECTION\\s+(\\w+)");
     static private final Pattern COMM_NAME_PATTERN = Pattern.compile("Name\\s+\"(.*)\"");
-    static private final Pattern GRAPH_NODES_PATTERN = Pattern.compile("Nodes\\s+(.*)");//\\s*(\\d+)");
-    static private final Pattern GRAPH_EDGES_PATTERN = Pattern.compile("Edges\\s+(.*)");
+    static private final Pattern GRAPH_NODES_PATTERN = Pattern.compile("Nodes\\s+(\\d+)");//\\s*()");
+    static private final Pattern GRAPH_EDGES_PATTERN = Pattern.compile("Edges\\s+(\\d+)");
     static private final Pattern GRAPH_ONE_EDGE_PATTERN = Pattern.compile("E\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)");
     static private final Pattern TERMINAL_COUNT_PATTERN = Pattern.compile("Terminals\\s+(\\d+)");
     static private final Pattern TERMINAL_ONE_PATTERN = Pattern.compile("T\\s+(\\d+)");
 
-    private SteinerGraph resultGraph;
+    private final SteinerGraph resultGraph = new SteinerGraph();
     private Scanner scanner;
-    //TODO rozwiazac kwestie zapisywania do grafu
-    //TODO nowa lepsza impplemnatcja grafu
 
-    public void loadFile(String filename) throws FileNotFoundException {
+    public SteinerGraph getResultGraph() {
+        return resultGraph;
+    }
+
+    public STPLoader(String filename) throws FileNotFoundException {
         ClassLoader classLoader = getClass().getClassLoader();
 
         try {
@@ -65,8 +65,7 @@ public class STPLoader {
                     throw new NotConsistentFileException("Missing EOF.");
                 }
             }
-        }
-        finally {
+        } finally {
             scanner.close();
         }
     }
@@ -79,16 +78,13 @@ public class STPLoader {
 
     private void loadComment() {
         String line;
-        String graphName = "NULL";
         while (!(line = readNextLine()).equals(END_SECTION)) {
             Matcher mather = COMM_NAME_PATTERN.matcher(line);
             if (mather.matches()) {
-                graphName = mather.group(1);
-                //TODO dodac zapisywanie do grafu
-                System.out.println("Graph name:\t" + mather.group(1));
+                resultGraph.setName(mather.group(1));
             }
         }
-        resultGraph = new SteinerGraph(graphName);
+
     }
 
     private void loadGraph() {
@@ -104,11 +100,10 @@ public class STPLoader {
                     }
                     String sys = matcher.group(1);
                     nodes = Integer.valueOf(sys);
-                    for(Integer i = 0; i < nodes; ++i) {
+                    for (Integer i = 0; i < nodes; ++i) {
                         Integer idNew = i + 1;
                         resultGraph.addNode(idNew.toString());
                     }
-                    System.out.println("Nodes: " + nodes);
                 }
                 matcher = GRAPH_EDGES_PATTERN.matcher(line);
                 if (matcher.matches()) {
@@ -116,14 +111,13 @@ public class STPLoader {
                         throw new NotConsistentFileException("Second edges count in Graph section");
                     }
                     edges = Integer.valueOf(matcher.group(1));
-                    System.out.println("Edges: " + edges);
                 }
                 matcher = GRAPH_ONE_EDGE_PATTERN.matcher(line);
                 if (matcher.matches()) {
                     if (nodes == null || edges == null) {
                         throw new NotConsistentFileException("No nodes or edges count information before edge description.");
                     }
-                    resultGraph.addEdge(matcher.group(1),matcher.group(2), Integer.valueOf(matcher.group(3)));
+                    resultGraph.addEdge(matcher.group(1), matcher.group(2), Integer.valueOf(matcher.group(3)));
                 }
 
             }
@@ -146,7 +140,6 @@ public class STPLoader {
                         throw new NotConsistentFileException("Second terminal in Graph section");
                     }
                     terminalsCount = Integer.valueOf(matcher.group(1));
-                    System.out.println("Terminal count: " + terminalsCount);
                 }
 
                 matcher = TERMINAL_ONE_PATTERN.matcher(line);
@@ -154,8 +147,7 @@ public class STPLoader {
                     if (terminalsCount == null) {
                         throw new NotConsistentFileException("No terminal count information before edge description.");
                     }
-                    System.out.println("Node " + matcher.group(1) + " is terminal. ");
-
+                    resultGraph.setTerminal(matcher.group(1), true);
                 }
             }
         } catch (IndexOutOfBoundsException | IllegalStateException ex) {

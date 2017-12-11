@@ -10,9 +10,10 @@ import java.io.FileNotFoundException;
  */
 public class App {
     public static void main(String[] args) {
-        STPLoader stpLoader = new STPLoader();
+
         try {
-            stpLoader.loadFile("steinlib/C/c12.stp"); //"proste_grafy/g1.stp");
+            STPLoader stpLoader = new STPLoader("steinlib/C/c12.stp");
+            System.out.println(stpLoader.getResultGraph().getNodes()); //"proste_grafy/g1.stp");
         } catch (FileNotFoundException e) {
             System.out.println("Cant find a file" + e.getLocalizedMessage());
         } catch (NotConsistentFileException ex) {
@@ -20,7 +21,5 @@ public class App {
         } catch (IllegalStateException ex) {
             System.out.println("Scanner is closed: " + ex.getLocalizedMessage());
         }
-        SteinerGraph.run();
-
     }
 }
