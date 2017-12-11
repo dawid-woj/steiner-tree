@@ -2,7 +2,6 @@ package pl.edu.pw.elka.gis.steinar;
 
 import pl.edu.pw.elka.gis.steinar.io.NotConsistentFileException;
 import pl.edu.pw.elka.gis.steinar.io.STPLoader;
-import pl.edu.pw.elka.gis.steinar.model.Graph;
 
 import java.io.FileNotFoundException;
 
@@ -21,9 +20,7 @@ public class App {
         } catch (IllegalStateException ex) {
             System.out.println("Scanner is closed: " + ex.getLocalizedMessage());
         }
+        SteinerGraph.run();
 
-        Graph graph = new Graph();
-        graph.addEdge(1, 2, 3);
-        System.out.println(graph);
     }
 }

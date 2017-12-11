@@ -1,6 +1,8 @@
 package pl.edu.pw.elka.gis.steinar.io;
 
+import pl.edu.pw.elka.gis.steinar.SteinerGraph;
 import pl.edu.pw.elka.gis.steinar.model.Graph;
+import scala.Int;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -20,13 +22,12 @@ public class STPLoader {
     static private final Pattern TERMINAL_COUNT_PATTERN = Pattern.compile("Terminals\\s+(\\d+)");
     static private final Pattern TERMINAL_ONE_PATTERN = Pattern.compile("T\\s+(\\d+)");
 
-    private Graph resultGraph = new Graph();
+    private SteinerGraph resultGraph;
     private Scanner scanner;
     //TODO rozwiazac kwestie zapisywania do grafu
     //TODO nowa lepsza impplemnatcja grafu
 
     public void loadFile(String filename) throws FileNotFoundException {
-        StringBuilder result = new StringBuilder("");
         ClassLoader classLoader = getClass().getClassLoader();
 
         try {
@@ -63,9 +64,7 @@ public class STPLoader {
                 if (!scanner.hasNextLine()) {
                     throw new NotConsistentFileException("Missing EOF.");
                 }
-                result.append(line).append("\n");
             }
-            System.out.println(result);
         }
         finally {
             scanner.close();
@@ -80,14 +79,16 @@ public class STPLoader {
 
     private void loadComment() {
         String line;
+        String graphName = "NULL";
         while (!(line = readNextLine()).equals(END_SECTION)) {
             Matcher mather = COMM_NAME_PATTERN.matcher(line);
             if (mather.matches()) {
+                graphName = mather.group(1);
                 //TODO dodac zapisywanie do grafu
                 System.out.println("Graph name:\t" + mather.group(1));
             }
         }
-
+        resultGraph = new SteinerGraph(graphName);
     }
 
     private void loadGraph() {
@@ -103,6 +104,10 @@ public class STPLoader {
                     }
                     String sys = matcher.group(1);
                     nodes = Integer.valueOf(sys);
+                    for(Integer i = 0; i < nodes; ++i) {
+                        Integer idNew = i + 1;
+                        resultGraph.addNode(idNew.toString());
+                    }
                     System.out.println("Nodes: " + nodes);
                 }
                 matcher = GRAPH_EDGES_PATTERN.matcher(line);
@@ -118,7 +123,7 @@ public class STPLoader {
                     if (nodes == null || edges == null) {
                         throw new NotConsistentFileException("No nodes or edges count information before edge description.");
                     }
-                    resultGraph.addEdge(Integer.valueOf(matcher.group(1)), Integer.valueOf(matcher.group(2)), Integer.valueOf(matcher.group(3)));
+                    resultGraph.addEdge(matcher.group(1),matcher.group(2), Integer.valueOf(matcher.group(3)));
                 }
 
             }
