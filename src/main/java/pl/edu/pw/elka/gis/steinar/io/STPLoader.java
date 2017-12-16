@@ -1,5 +1,6 @@
 package pl.edu.pw.elka.gis.steinar.io;
 
+import pl.edu.pw.elka.gis.steinar.io.exceptions.NotConsistentFileException;
 import pl.edu.pw.elka.gis.steinar.model.SteinerGraph;
 
 import java.io.File;
@@ -8,13 +9,13 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class STPLoader {
-    static private final String STP_HEADER = "33D32945 STP File, STP Format Version 1.0";
-    static private final String END_SECTION = "END";
+import static pl.edu.pw.elka.gis.steinar.io.STPCommons.END_SECTION;
+import static pl.edu.pw.elka.gis.steinar.io.STPCommons.STP_HEADER;
 
+public class STPLoader {
     static private final Pattern SECTION_PATTERN = Pattern.compile("SECTION\\s+(\\w+)");
     static private final Pattern COMM_NAME_PATTERN = Pattern.compile("Name\\s+\"(.*)\"");
-    static private final Pattern GRAPH_NODES_PATTERN = Pattern.compile("Nodes\\s+(\\d+)");//\\s*()");
+    static private final Pattern GRAPH_NODES_PATTERN = Pattern.compile("Nodes\\s+(\\d+)");
     static private final Pattern GRAPH_EDGES_PATTERN = Pattern.compile("Edges\\s+(\\d+)");
     static private final Pattern GRAPH_ONE_EDGE_PATTERN = Pattern.compile("E\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)");
     static private final Pattern TERMINAL_COUNT_PATTERN = Pattern.compile("Terminals\\s+(\\d+)");
