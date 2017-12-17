@@ -1,5 +1,6 @@
 package pl.edu.pw.elka.gis.steinar.io;
 
+import org.graphstream.graph.Edge;
 import pl.edu.pw.elka.gis.steinar.io.exceptions.NotConsistentFileException;
 import pl.edu.pw.elka.gis.steinar.model.SteinerGraph;
 
@@ -20,6 +21,7 @@ public class STPLoader {
     static private final Pattern GRAPH_ONE_EDGE_PATTERN = Pattern.compile("E\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)");
     static private final Pattern TERMINAL_COUNT_PATTERN = Pattern.compile("Terminals\\s+(\\d+)");
     static private final Pattern TERMINAL_ONE_PATTERN = Pattern.compile("T\\s+(\\d+)");
+    static private final Pattern SOLUTION_ONE_PATTERN = Pattern.compile("S\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)");
 
     private final SteinerGraph resultGraph = new SteinerGraph();
     private Scanner scanner;
@@ -57,6 +59,12 @@ public class STPLoader {
                         case "Terminals":
                             loadTerminals();
                             break;
+                        case "Solution":
+                            loadSolution();
+                            break;
+                        case "Result":
+                            loadResult();
+                            break;
                         default:
                             throw new NotConsistentFileException("Cannot recognize section");
                     }
@@ -70,7 +78,10 @@ public class STPLoader {
             scanner.close();
         }
     }
-
+    private void loadResult() {
+        //Don't read result
+        while (!readNextLine().equals(END_SECTION));
+    }
     private void readAndCheckHeader() {
         if (!readNextLine().equals(STP_HEADER)) {
             throw new NotConsistentFileException("Wrong file header.");
@@ -156,6 +167,27 @@ public class STPLoader {
         }
     }
 
+    private void loadSolution() {
+        try {
+            String line;
+            while (!(line = readNextLine()).equals(END_SECTION)) {
+
+                Matcher matcher = SOLUTION_ONE_PATTERN.matcher(line);
+                if (matcher.matches()) {
+                    Edge edge = resultGraph.getEdge(matcher.group(1), matcher.group(2));
+                    if (edge == null) {
+                        throw new NotConsistentFileException("No nodes or edges count information before edge description.");
+                    }
+                    resultGraph.setEdgeResultTree(edge.getId(), true);
+                }
+
+            }
+            System.out.println(resultGraph);
+
+        } catch (IndexOutOfBoundsException | IllegalStateException ex) {
+            throw new NotConsistentFileException("Cannot read Graph section. " + ex.getMessage());
+        }
+    }
 
     private String readNextLine() {
         if (!scanner.hasNextLine()) {

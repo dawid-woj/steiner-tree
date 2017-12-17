@@ -3,6 +3,9 @@ package pl.edu.pw.elka.gis.steinar;
 import pl.edu.pw.elka.gis.steinar.io.STPSaver;
 import pl.edu.pw.elka.gis.steinar.io.exceptions.NotConsistentFileException;
 import pl.edu.pw.elka.gis.steinar.io.STPLoader;
+import pl.edu.pw.elka.gis.steinar.model.SolutionMeasurement;
+import pl.edu.pw.elka.gis.steinar.model.SteinerAlgorithmEnum;
+import pl.edu.pw.elka.gis.steinar.model.SteinerGraph;
 
 import java.io.FileNotFoundException;
 
@@ -14,8 +17,9 @@ public class App {
 
         try {
             STPLoader stpLoader = new STPLoader("proste_grafy/g1.stp");
-            System.out.println(stpLoader.getResultGraph().getNodes()); //"proste_grafy/g1.stp");
-            STPSaver.save("out1.stp", stpLoader.getResultGraph());
+            System.out.println(stpLoader.getResultGraph().getNodes());
+            stpLoader.getResultGraph().getEdges("2").forEach( edge -> edge.setAttribute(SteinerGraph.RESULT_TREE_ATTR, true));
+            STPSaver.save("out1.stp", stpLoader.getResultGraph(), new SolutionMeasurement(1, 2.0f, SteinerAlgorithmEnum.KMB));
         } catch (FileNotFoundException e) {
             System.out.println("Cant find a file" + e.getLocalizedMessage());
         } catch (NotConsistentFileException ex) {
