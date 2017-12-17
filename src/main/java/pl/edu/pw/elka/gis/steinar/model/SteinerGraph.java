@@ -101,12 +101,20 @@ public class SteinerGraph {
     }
 
     public boolean edgeIsResultTree(String idEdge) {
-        Boolean result = graph.getNode(idEdge).getAttribute(RESULT_TREE_ATTR, Boolean.class);
-        return result != null ? result : false;
+        Edge edge = graph.getNode(idEdge);
+        Boolean result = false;
+        if(edge.hasAttribute(RESULT_TREE_ATTR)) {
+            result = edge.getAttribute(RESULT_TREE_ATTR, Boolean.class);
+        }
+        return result;
     }
 
     public void clearSolution() {
         graph.getEdgeSet().forEach(edge -> edge.setAttribute(RESULT_TREE_ATTR, false));
+    }
+
+    public final Graph getGraph() {
+        return graph;
     }
 
     @Override

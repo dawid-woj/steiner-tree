@@ -70,7 +70,7 @@ public class STPSaver {
             writer.println(String.format(SECTION_FORMATTER, "Terminals"));
             writer.println(String.format(TERMINAL_COUNT_FORMATTER, terminalList.size()));
             terminalList.forEach(node ->
-                writer.println(String.format(TERMINAL_ONE_FORMATTER, node.getId()))
+                    writer.println(String.format(TERMINAL_ONE_FORMATTER, node.getId()))
             );
             writer.println(STPCommons.END_SECTION);
             writer.println();
@@ -90,6 +90,8 @@ public class STPSaver {
             writer.println("EOF");
 
             writer.close();
+
+            System.out.println(String.format("Graph %s saved to file %s", steinerGraph.getName(), filename));
         } catch (FileNotFoundException e) {
             throw new FileNotFoundException(filename);
         } catch (UnsupportedEncodingException e) {

@@ -133,7 +133,7 @@ public class STPLoader {
                 }
 
             }
-            System.out.println(resultGraph);
+            System.out.println(String.format("Graph %s loaded correctly.", getResultGraph().getName()));
 
         } catch (IndexOutOfBoundsException | IllegalStateException ex) {
             throw new NotConsistentFileException("Cannot read Graph section. " + ex.getMessage());
