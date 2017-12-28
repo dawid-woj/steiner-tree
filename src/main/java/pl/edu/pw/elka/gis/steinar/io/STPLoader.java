@@ -1,5 +1,7 @@
 package pl.edu.pw.elka.gis.steinar.io;
 
+import org.graphstream.graph.Edge;
+import pl.edu.pw.elka.gis.steinar.io.exceptions.NotConsistentFileException;
 import pl.edu.pw.elka.gis.steinar.model.SteinerGraph;
 
 import java.io.File;
@@ -8,17 +10,18 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class STPLoader {
-    static private final String STP_HEADER = "33D32945 STP File, STP Format Version 1.0";
-    static private final String END_SECTION = "END";
+import static pl.edu.pw.elka.gis.steinar.io.STPCommons.END_SECTION;
+import static pl.edu.pw.elka.gis.steinar.io.STPCommons.STP_HEADER;
 
+public class STPLoader {
     static private final Pattern SECTION_PATTERN = Pattern.compile("SECTION\\s+(\\w+)");
     static private final Pattern COMM_NAME_PATTERN = Pattern.compile("Name\\s+\"(.*)\"");
-    static private final Pattern GRAPH_NODES_PATTERN = Pattern.compile("Nodes\\s+(\\d+)");//\\s*()");
+    static private final Pattern GRAPH_NODES_PATTERN = Pattern.compile("Nodes\\s+(\\d+)");
     static private final Pattern GRAPH_EDGES_PATTERN = Pattern.compile("Edges\\s+(\\d+)");
     static private final Pattern GRAPH_ONE_EDGE_PATTERN = Pattern.compile("E\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)");
     static private final Pattern TERMINAL_COUNT_PATTERN = Pattern.compile("Terminals\\s+(\\d+)");
     static private final Pattern TERMINAL_ONE_PATTERN = Pattern.compile("T\\s+(\\d+)");
+    static private final Pattern SOLUTION_ONE_PATTERN = Pattern.compile("S\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)");
 
     private final SteinerGraph resultGraph = new SteinerGraph();
     private Scanner scanner;
@@ -56,6 +59,12 @@ public class STPLoader {
                         case "Terminals":
                             loadTerminals();
                             break;
+                        case "Solution":
+                            loadSolution();
+                            break;
+                        case "Result":
+                            loadResult();
+                            break;
                         default:
                             throw new NotConsistentFileException("Cannot recognize section");
                     }
@@ -69,7 +78,10 @@ public class STPLoader {
             scanner.close();
         }
     }
-
+    private void loadResult() {
+        //Don't read result
+        while (!readNextLine().equals(END_SECTION));
+    }
     private void readAndCheckHeader() {
         if (!readNextLine().equals(STP_HEADER)) {
             throw new NotConsistentFileException("Wrong file header.");
@@ -121,7 +133,7 @@ public class STPLoader {
                 }
 
             }
-            System.out.println(resultGraph);
+            System.out.println(String.format("Graph %s loaded correctly.", getResultGraph().getName()));
 
         } catch (IndexOutOfBoundsException | IllegalStateException ex) {
             throw new NotConsistentFileException("Cannot read Graph section. " + ex.getMessage());
@@ -155,6 +167,27 @@ public class STPLoader {
         }
     }
 
+    private void loadSolution() {
+        try {
+            String line;
+            while (!(line = readNextLine()).equals(END_SECTION)) {
+
+                Matcher matcher = SOLUTION_ONE_PATTERN.matcher(line);
+                if (matcher.matches()) {
+                    Edge edge = resultGraph.getEdge(matcher.group(1), matcher.group(2));
+                    if (edge == null) {
+                        throw new NotConsistentFileException("No nodes or edges count information before edge description.");
+                    }
+                    resultGraph.setEdgeResultTree(edge.getId(), true);
+                }
+
+            }
+            System.out.println(resultGraph);
+
+        } catch (IndexOutOfBoundsException | IllegalStateException ex) {
+            throw new NotConsistentFileException("Cannot read Graph section. " + ex.getMessage());
+        }
+    }
 
     private String readNextLine() {
         if (!scanner.hasNextLine()) {
