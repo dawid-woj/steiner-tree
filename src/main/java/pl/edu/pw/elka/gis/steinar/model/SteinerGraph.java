@@ -1,13 +1,15 @@
 package pl.edu.pw.elka.gis.steinar.model;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.SingleGraph;
 
-import java.util.Collection;
+import java.util.*;
 
-
+//FIXME: powyrzucac niepotrzebne/nieuzywane metody
 public class SteinerGraph {
     private static int NEW_GRAPH_ID = 0;
 
@@ -15,8 +17,15 @@ public class SteinerGraph {
     public static final String TERMINAL_ATTR = "terminal";
     public static final String RESULT_TREE_ATTR = "result_tree_attr";
 
+    @Getter
     private final Graph graph;
+    @Getter
+    @Setter
     private String name;
+    @Getter
+    private Set<String> terminalNodeIds = new HashSet<>();
+    @Getter
+    private List<Edge> resultTreeEdges = new ArrayList<>();
 
     public SteinerGraph() {
         graph = new SingleGraph(generateNewGraphID());
@@ -25,14 +34,6 @@ public class SteinerGraph {
     public SteinerGraph(SteinerGraph another) {
         this.name = another.name;
         this.graph = another.graph;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public Edge addEdge(String idNode1, String idNode2, Integer weight) {
@@ -48,7 +49,8 @@ public class SteinerGraph {
     }
 
     public void deleteNode(String idNode) {
-        graph.removeNode(idNode);
+        this.graph.removeNode(idNode);
+        this.terminalNodeIds.remove(idNode);
     }
 
     public Collection<Node> getNodes() {
@@ -86,18 +88,52 @@ public class SteinerGraph {
         return n.getAttribute(WEIGHT_ATTR, Integer.class);
     }
 
-    public void setTerminal(String nodeId, boolean isTerminal) {
+    public void markAsTerminal(String nodeId) {
         Node node = graph.getNode(nodeId);
-        node.setAttribute(TERMINAL_ATTR, isTerminal);
+        node.changeAttribute(TERMINAL_ATTR, true);
+        this.terminalNodeIds.add(nodeId);
     }
 
-    public boolean nodeIsTerminal(String nodeid) {
-        Boolean result =  graph.getNode(nodeid).getAttribute(TERMINAL_ATTR, Boolean.class);
+    public boolean isTerminal(Node node) {
+        Boolean result =  node.getAttribute(TERMINAL_ATTR, Boolean.class);
         return result != null ? result : false;
     }
 
-    public void setEdgeResultTree(String idEdge, boolean isResultTree) {
-        graph.getEdge(idEdge).setAttribute(RESULT_TREE_ATTR, isResultTree);
+    public int getTerminalCount() {
+        return this.terminalNodeIds.size();
+    }
+
+    public int getNodeCount() {
+        return this.graph.getNodeCount();
+    }
+
+    public int getEdgeCount() {
+        return this.graph.getEdgeCount();
+    }
+
+    public void markEdgeInResultTree(String idEdge) {
+        graph.getEdge(idEdge).setAttribute(RESULT_TREE_ATTR, true);
+    }
+
+    public void markEdgeResultTree(Edge edge) {
+        edge.setAttribute(RESULT_TREE_ATTR, true);
+    }
+
+    public void setResultTreeEdges(Collection<Edge> edges) {
+        edges.forEach(this::markEdgeResultTree);
+        this.resultTreeEdges.addAll(edges);
+    }
+
+    public int getResultTreeWeight() {
+        int weight = 0;
+        for (Edge edge : this.resultTreeEdges) {
+            weight += edge.<Integer>getAttribute(SteinerGraph.WEIGHT_ATTR);
+        }
+        return weight;
+    }
+
+    public int getResultTreeEdgeCount() {
+        return this.resultTreeEdges.size();
     }
 
     public boolean edgeIsResultTree(String idEdge) {
@@ -110,11 +146,8 @@ public class SteinerGraph {
     }
 
     public void clearSolution() {
-        graph.getEdgeSet().forEach(edge -> edge.setAttribute(RESULT_TREE_ATTR, false));
-    }
-
-    public final Graph getGraph() {
-        return graph;
+        this.graph.getEdgeSet().forEach(edge -> edge.removeAttribute(RESULT_TREE_ATTR));
+        this.resultTreeEdges.clear();
     }
 
     @Override
@@ -142,8 +175,8 @@ public class SteinerGraph {
         return out.toString();
     }
 
-
     private static String generateNewGraphID() {
         return "Graph" + String.valueOf(NEW_GRAPH_ID++);
     }
+
 }

@@ -75,12 +75,7 @@ public class STPSaver {
             writer.println(STPCommons.END_SECTION);
             writer.println();
 
-            List<Edge> resultList = edgeHashMap.values().stream()
-                    .filter(edge -> {
-                        Boolean result = edge.getAttribute(SteinerGraph.RESULT_TREE_ATTR, Boolean.class);
-                        return result != null ? result : false;
-                    })
-                    .collect(Collectors.toList());
+            List<Edge> resultList = steinerGraph.getResultTreeEdges();
 
             writer.println(String.format(SECTION_FORMATTER, "Solution"));
             resultList.forEach(edge -> writer.println(String.format(SOLUTION_ONE_FORMATTER, edge.getNode0().getId(), edge.getNode1().getId(), edge.getAttribute(SteinerGraph.WEIGHT_ATTR, Integer.class))));

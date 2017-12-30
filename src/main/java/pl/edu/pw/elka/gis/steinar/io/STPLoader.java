@@ -78,10 +78,12 @@ public class STPLoader {
             scanner.close();
         }
     }
+
     private void loadResult() {
         //Don't read result
         while (!readNextLine().equals(END_SECTION));
     }
+
     private void readAndCheckHeader() {
         if (!readNextLine().equals(STP_HEADER)) {
             throw new NotConsistentFileException("Wrong file header.");
@@ -159,7 +161,7 @@ public class STPLoader {
                     if (terminalsCount == null) {
                         throw new NotConsistentFileException("No terminal count information before edge description.");
                     }
-                    resultGraph.setTerminal(matcher.group(1), true);
+                    resultGraph.markAsTerminal(matcher.group(1));
                 }
             }
         } catch (IndexOutOfBoundsException | IllegalStateException ex) {
@@ -178,7 +180,7 @@ public class STPLoader {
                     if (edge == null) {
                         throw new NotConsistentFileException("No nodes or edges count information before edge description.");
                     }
-                    resultGraph.setEdgeResultTree(edge.getId(), true);
+                    resultGraph.markEdgeInResultTree(edge.getId());
                 }
 
             }
