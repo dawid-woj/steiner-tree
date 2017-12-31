@@ -6,6 +6,7 @@ import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.SingleGraph;
+import pl.edu.pw.elka.gis.steinar.algorithms.Utils;
 
 import java.util.*;
 
@@ -33,7 +34,9 @@ public class SteinerGraph {
 
     public SteinerGraph(SteinerGraph another) {
         this.name = another.name;
-        this.graph = another.graph;
+        this.graph = Utils.copyGraph(another.graph, generateNewGraphID());
+        this.terminalNodeIds.addAll(another.terminalNodeIds);
+        this.resultTreeEdges.addAll(another.resultTreeEdges);
     }
 
     public Edge addEdge(String idNode1, String idNode2, Integer weight) {

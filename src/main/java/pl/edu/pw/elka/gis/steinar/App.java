@@ -97,6 +97,7 @@ public class App {
 
     // ************************************* PRIM/DIJKSTRA TEST *********************************************
 
+    //TODO: do testow/demo - do usuniecia
     public static Graph exampleGraph() {
         Graph g = new SingleGraph("example");
         g.addNode("A").addAttribute("xy", 0, 1);
@@ -105,15 +106,15 @@ public class App {
         g.addNode("D").addAttribute("xy", 1, 0);
         g.addNode("E").addAttribute("xy", 2, 2);
         g.addNode("F").addAttribute("xy", 2, 1);
-        g.addEdge("AB", "A", "B").addAttribute("length", 14);
-        g.addEdge("AC", "A", "C").addAttribute("length", 9);
-        g.addEdge("AD", "A", "D").addAttribute("length", 7);
-        g.addEdge("BC", "B", "C").addAttribute("length", 2);
-        g.addEdge("CD", "C", "D").addAttribute("length", 10);
-        g.addEdge("BE", "B", "E").addAttribute("length", 9);
-        g.addEdge("CF", "C", "F").addAttribute("length", 11);
-        g.addEdge("DF", "D", "F").addAttribute("length", 15);
-        g.addEdge("EF", "E", "F").addAttribute("length", 6);
+        g.addEdge("A:B", "A", "B").addAttribute("length", 14);
+        g.addEdge("A:C", "A", "C").addAttribute("length", 9);
+        g.addEdge("A:D", "A", "D").addAttribute("length", 7);
+        g.addEdge("B:C", "B", "C").addAttribute("length", 2);
+        g.addEdge("C:D", "C", "D").addAttribute("length", 10);
+        g.addEdge("B:E", "B", "E").addAttribute("length", 9);
+        g.addEdge("C:F", "C", "F").addAttribute("length", 11);
+        g.addEdge("D:F", "D", "F").addAttribute("length", 15);
+        g.addEdge("E:F", "E", "F").addAttribute("length", 6);
         for (Node n : g)
             n.addAttribute("label", n.getId());
         for (Edge e : g.getEachEdge())
@@ -121,6 +122,7 @@ public class App {
         return g;
     }
 
+    //TODO: demko korzystania z dijkstry - do usuniecia
     public static void dijkstraTest() {
         Graph g = exampleGraph();
         g.display(false);
@@ -155,6 +157,7 @@ public class App {
         algo.clear();
     }
 
+    //TODO: demko korzystania z prima - do usuniecia
     public static void primTest() {
         Graph g = exampleGraph();
         String styleSheet =
@@ -196,9 +199,6 @@ public class App {
     // ***************************************************************************************************
 
     public static void main(String[] args) {
-//        dijkstraTest();
-//        primTest();
-
         String inputGraphFilename = "proste_grafy/g1.stp";
         String solutionOutputFilename = "g1_solved.stp";
         SteinerAlgorithmEnum algorithm = SteinerAlgorithmEnum.HAKIMI;
