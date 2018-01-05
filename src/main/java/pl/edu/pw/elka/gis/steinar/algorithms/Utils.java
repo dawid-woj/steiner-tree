@@ -102,17 +102,33 @@ public class Utils {
     }
 
     /**
+     * Zwraca zbiór wszystkich terminalnów węzłów danego grafu steinera.
+     *
+     * @param steinerGraph  graf steinera
+     * @return              zbiór wierzchołków terminalnych
+     */
+    public static Set<Node> getTerminalNodes(SteinerGraph steinerGraph) {
+        Set<Node> nonTerminals = new HashSet<>();
+        for (Node node : steinerGraph.getNodes()) {
+            if (steinerGraph.isTerminal(node)) {
+                nonTerminals.add(node);
+            }
+        }
+        return nonTerminals;
+    }
+
+    /**
      * Generowanie wszystkich podzbiorów danego zbioru węzłów grafu.
      *
      * @param nodes zbiór węzłów grafu
      * @return      lista wszystkich podzbiorów danego zbioru węzłów
      */
-    public static List<Set<Node>> getNodeSubsets(List<Node> nodes) {
-        List<Set<Node>> subsets = new LinkedList<>();
+    public static List<List<Node>> getNodeSubsets(List<Node> nodes) {
+        List<List<Node>> subsets = new ArrayList<>();
         int subsetsCount = 1 << nodes.size();
 
         for (int i = 0; i < subsetsCount; ++i) {
-            Set<Node> subset = new HashSet<>();
+            ArrayList<Node> subset = new ArrayList<>();
             int mask = 1;
 
             for (int k = 0; k < nodes.size(); ++k) {

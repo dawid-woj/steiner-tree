@@ -123,7 +123,14 @@ public class SteinerGraph {
     }
 
     public void setResultTreeEdges(Collection<Edge> edges) {
-        edges.forEach(this::markEdgeResultTree);
+        graph.getEdgeSet()
+                .stream()
+                .filter( e -> edges
+                        .stream()
+                        .anyMatch(e2 -> e.getId().equals(e2.getId()))
+                )
+                .forEach(this::markEdgeResultTree);
+
         this.resultTreeEdges.addAll(edges);
     }
 
