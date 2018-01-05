@@ -16,10 +16,10 @@ import java.util.List;
 @NoArgsConstructor
 public abstract class AbstractMinimumSteinerTreeAlgorithm {
 
-    private static final String DIJKSTRA_RESULT_ATTR = "dijkstra_result";
-    private static final String DIJKSTRA_SOLUTION_ATTR = "dijkstra_solution";
-    private static final String PRIM_RESULT_ATTR = "prim_result";
-    private static final String PRIM_SOLUTION_ATTR = "prim_solution";
+    protected static final String DIJKSTRA_RESULT_ATTR = "dijkstra_result";
+    protected static final String DIJKSTRA_SOLUTION_ATTR = "dijkstra_solution";
+    protected static final String PRIM_RESULT_ATTR = "prim_result";
+    protected static final String PRIM_SOLUTION_ATTR = "prim_solution";
 
     @Getter
     protected SteinerGraph steinerGraph;
