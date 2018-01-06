@@ -39,6 +39,7 @@ public abstract class AbstractSpanningTreeAlgorithm {
                      String resultAttributeName, String inSolutionAttributeName) {
         this.graph = graph;
         this.edgeWeightAttributeName = edgeWeightAttributeName;
+        this.edgeWeightAttributeName = edgeWeightAttributeName;
         this.resultAttributeName = resultAttributeName;
         this.inSolutionAttributeName = inSolutionAttributeName;
         this.start = this.graph.getNode(startingNodeId);
