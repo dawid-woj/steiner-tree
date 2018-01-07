@@ -39,12 +39,14 @@ public class STPSaver {
             writer.println();
 
             //Section Result
-            writer.println(String.format(SECTION_FORMATTER, "Result"));
-            writer.println(String.format("Length %d", solutionMeasurement.getLength()));
-            writer.println(String.format("Time %f", solutionMeasurement.getTime()));
-            writer.println(String.format("Algorithm %s", solutionMeasurement.getAlgorithm().name()));
-            writer.println(STPCommons.END_SECTION);
-            writer.println();
+            if (solutionMeasurement != null) {
+                writer.println(String.format(SECTION_FORMATTER, "Result"));
+                writer.println(String.format("Length %d", solutionMeasurement.getLength()));
+                writer.println(String.format("Time %f", solutionMeasurement.getTime()));
+                writer.println(String.format("Algorithm %s", solutionMeasurement.getAlgorithm().name()));
+                writer.println(STPCommons.END_SECTION);
+                writer.println();
+            }
 
 
             //Section Comment
@@ -77,10 +79,12 @@ public class STPSaver {
 
             List<Edge> resultList = steinerGraph.getResultTreeEdges();
 
-            writer.println(String.format(SECTION_FORMATTER, "Solution"));
-            resultList.forEach(edge -> writer.println(String.format(SOLUTION_ONE_FORMATTER, edge.getNode0().getId(), edge.getNode1().getId(), edge.getAttribute(SteinerGraph.WEIGHT_ATTR, Integer.class))));
-            writer.println(STPCommons.END_SECTION);
-            writer.println();
+            if (solutionMeasurement != null) {
+                writer.println(String.format(SECTION_FORMATTER, "Solution"));
+                resultList.forEach(edge -> writer.println(String.format(SOLUTION_ONE_FORMATTER, edge.getNode0().getId(), edge.getNode1().getId(), edge.getAttribute(SteinerGraph.WEIGHT_ATTR, Integer.class))));
+                writer.println(STPCommons.END_SECTION);
+                writer.println();
+            }
 
             writer.println("EOF");
 

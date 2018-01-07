@@ -32,6 +32,12 @@ public class SteinerGraph {
         graph = new SingleGraph(generateNewGraphID());
     }
 
+    public SteinerGraph(String name, Graph graph, Collection<String> terminalIds) {
+        this.name = name;
+        this.graph = graph;
+        terminalIds.forEach(this::markAsTerminal);
+    }
+
     public SteinerGraph(SteinerGraph another) {
         this.name = another.name;
         this.graph = Utils.copyGraph(another.graph, generateNewGraphID());

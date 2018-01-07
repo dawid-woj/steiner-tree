@@ -14,7 +14,7 @@ import java.nio.file.StandardOpenOption;
 public class CSVWriter {
 
     private final String HEADER = "Nazwa grafu,Liczba wierzchołków,Liczba krawędzi,Liczba terminali," +
-            "Czas wykonania [s],Koszt drzewa Steinera,Liczba krawędzi drzewa Steinera";
+            "Czas wykonania [s],Optymalny koszt drzewa,Koszt drzewa";
 
     private final String filename;
 
@@ -40,19 +40,17 @@ public class CSVWriter {
         appendContent(HEADER + System.lineSeparator());
     }
 
-    public void append(AlgorithmOutput output) {
+    public void append(AlgorithmOutput output, int optimumWeight) {
         String graphName = output.getGraph().getName();
         int graphNodeCount = output.getGraph().getNodeCount();
         int graphEdgeCount = output.getGraph().getEdgeCount();
         int terminalCount = output.getGraph().getTerminalCount();
         float algorithmRunningTime = output.getMeasurement().getTime();
-        int steinerTreeEdgeCount = output.getGraph().getResultTreeEdgeCount();
         int steinerTreeWeight = output.getMeasurement().getLength();
 
         String line = graphName + "," + graphNodeCount + "," + graphEdgeCount + "," + terminalCount + "," +
-                algorithmRunningTime + "," + steinerTreeWeight + "," + steinerTreeEdgeCount + System.lineSeparator();
+                algorithmRunningTime + "," + optimumWeight + "," + steinerTreeWeight + "," + System.lineSeparator();
         appendContent(line);
     }
-
 
 }

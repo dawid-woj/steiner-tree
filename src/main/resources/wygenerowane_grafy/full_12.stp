@@ -1,0 +1,92 @@
+33D32945 STP File, STP Format Version 1.0
+
+SECTION Comment
+Name full_12
+END
+
+SECTION Graph
+Nodes 12
+Edges 66
+E 10 2 5
+E 12 8 6
+E 12 7 2
+E 10 9 12
+E 12 6 12
+E 10 8 2
+E 12 5 18
+E 10 7 7
+E 12 4 16
+E 10 6 1
+E 12 3 11
+E 10 5 7
+E 12 2 3
+E 10 4 12
+E 10 3 20
+E 11 10 8
+E 12 10 16
+E 12 1 18
+E 11 1 6
+E 10 1 17
+E 2 1 18
+E 3 1 18
+E 4 1 4
+E 5 1 19
+E 6 1 10
+E 4 3 7
+E 7 1 8
+E 5 3 6
+E 8 1 7
+E 6 3 1
+E 9 1 10
+E 7 3 6
+E 8 3 10
+E 6 5 14
+E 9 3 16
+E 7 5 7
+E 8 5 17
+E 9 5 17
+E 8 7 18
+E 9 7 5
+E 12 9 20
+E 11 9 11
+E 11 8 2
+E 11 7 12
+E 11 6 4
+E 11 5 1
+E 11 4 7
+E 11 3 18
+E 11 2 7
+E 3 2 12
+E 4 2 16
+E 5 2 14
+E 6 2 15
+E 7 2 6
+E 5 4 2
+E 8 2 20
+E 6 4 1
+E 9 2 9
+E 7 4 19
+E 8 4 1
+E 12 11 4
+E 9 4 2
+E 7 6 13
+E 8 6 12
+E 9 6 4
+E 9 8 18
+END
+
+SECTION Terminals
+Terminals 10
+T 1
+T 2
+T 3
+T 4
+T 5
+T 6
+T 7
+T 8
+T 10
+T 12
+END
+
+EOF

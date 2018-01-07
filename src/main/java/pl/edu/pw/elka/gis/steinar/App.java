@@ -1,16 +1,13 @@
 package pl.edu.pw.elka.gis.steinar;
 
-import org.jfree.data.io.CSV;
+import org.graphstream.graph.Graph;
 import pl.edu.pw.elka.gis.steinar.algorithms.*;
 import pl.edu.pw.elka.gis.steinar.display.DisplaySteinerGraph;
 import pl.edu.pw.elka.gis.steinar.io.CSVWriter;
 import pl.edu.pw.elka.gis.steinar.io.STPSaver;
 import pl.edu.pw.elka.gis.steinar.io.exceptions.NotConsistentFileException;
 import pl.edu.pw.elka.gis.steinar.io.STPLoader;
-import pl.edu.pw.elka.gis.steinar.model.AlgorithmOutput;
-import pl.edu.pw.elka.gis.steinar.model.SolutionMeasurement;
-import pl.edu.pw.elka.gis.steinar.model.SteinerAlgorithmEnum;
-import pl.edu.pw.elka.gis.steinar.model.SteinerGraph;
+import pl.edu.pw.elka.gis.steinar.model.*;
 
 import java.io.FileNotFoundException;
 import java.util.*;
@@ -95,8 +92,18 @@ public class App {
         }
     }
 
+    private static void saveSteinerGraph(SteinerGraph graph, String filename) {
+        try {
+            STPSaver.save(filename, graph, null);
+        } catch (FileNotFoundException e) {
+            System.out.println("Exception occurred during STP file saving: " + e.getLocalizedMessage());
+            e.printStackTrace();
+        }
+    }
+
     private static void runTests(CSVWriter resultsWriter, String inputGraphFilenamePrefix, String[] graphNames,
-                                 SteinerAlgorithmEnum algoType) {
+                                 int[] optimumWeights, SteinerAlgorithmEnum algoType) {
+        int i = 0;
         for (String name : graphNames) {
             String inputFilename = inputGraphFilenamePrefix + name + ".stp";
             String outputFilename = RESULTS_DIRNAME + name + "_" + algoType + ".stp";
@@ -113,7 +120,7 @@ public class App {
                 saveSolution(output, outputFilename);
 
                 System.out.println("   Appending solution info to results file...");
-                resultsWriter.append(output);
+                resultsWriter.append(output, optimumWeights[i++]);
             } else {
                 System.out.println("SteinerGraph is null!");
                 return;
@@ -123,40 +130,87 @@ public class App {
 
     private static void runSimpleGraphTests(SteinerAlgorithmEnum algoType) {
         String[] graphNames = {"g1b", "g1d", "g2a", "g2b", "g2c", "g3a", "g3b", "g4a", "g4b", "g5"};
+        int[] optimumWeights = {5, 7, 14, 13, 16, 14, 6, 8, 7, 28};
 
         CSVWriter resultsWriter = new CSVWriter(RESULTS_DIRNAME + "proste_grafy_wyniki_" + algoType + ".csv");
         resultsWriter.deleteFileIfExists();
         resultsWriter.writeHeader();
 
-        runTests(resultsWriter, RES_SIMPLE_GRAPHS_DIRNAME, graphNames, algoType);
+        runTests(resultsWriter, RES_SIMPLE_GRAPHS_DIRNAME, graphNames, optimumWeights, algoType);
     }
 
     private static void runSteinlibGraphTests(SteinerAlgorithmEnum algoType) {
-        String[] graphNames = {/*TODO*/};
+        String[] graphNames = {"b05", "b06", "b10", "b11", "b18", "c11", "c12", "c13", "c14", "c15", "c19", "c20",
+                "d19", "d20", "e06", "mc2", "mc3", "p455", "p457", "p459", "p461", "p463", "p464", "p465", "p466"};
+        int[] optimumWeights = {61, 122, 86, 88, 218, 32, 46, 258, 323, 556, 146, 267,
+                310, 537, 73, 71, 47, 1138, 1609, 2345, 4474, 1510, 2545, 3853, 6234};
 
         CSVWriter resultsWriter = new CSVWriter(RESULTS_DIRNAME + "steinlib_wyniki_" + algoType + ".csv");
         resultsWriter.deleteFileIfExists();
         resultsWriter.writeHeader();
 
-        runTests(resultsWriter, RES_STEINLIB_GRAPHS_DIRNAME, graphNames, algoType);
+        runTests(resultsWriter, RES_STEINLIB_GRAPHS_DIRNAME, graphNames, optimumWeights, algoType);
     }
 
-    private static void runGeneratedGraphTests(SteinerAlgorithmEnum algoType) {
-        String[] graphNames = {/*TODO*/};
+    private static void runGeneratedFullConnectedGraphTests(SteinerAlgorithmEnum algoType) {
+        String[] graphNames = {"full_12", "full_14", "full_16", "full_18", "full_20", "full_22", "full_24", "full_26"};
 
-        CSVWriter resultsWriter = new CSVWriter(RESULTS_DIRNAME + "wygenerowane_grafy_wyniki_" + algoType + ".csv");
+        CSVWriter resultsWriter = new CSVWriter(RESULTS_DIRNAME + "grafy_pelne_wyniki_" + algoType + ".csv");
         resultsWriter.deleteFileIfExists();
         resultsWriter.writeHeader();
 
-        runTests(resultsWriter, RES_GENERATED_GRAPHS_DIRNAME, graphNames, algoType);
+        runTests(resultsWriter, RES_GENERATED_GRAPHS_DIRNAME, graphNames, null, algoType);
+    }
+
+    private static void runGeneratedGridGraphTests(SteinerAlgorithmEnum algoType) {
+        String[] graphNames = {"grid_9", "grid_16", "grid_25", "grid_36"};
+
+        CSVWriter resultsWriter = new CSVWriter(RESULTS_DIRNAME + "kraty_wyniki_" + algoType + ".csv");
+        resultsWriter.deleteFileIfExists();
+        resultsWriter.writeHeader();
+
+        runTests(resultsWriter, RES_GENERATED_GRAPHS_DIRNAME, graphNames, null, algoType);
+    }
+
+    private static void generateAndSaveFullConnectedSteinerGraphs() {
+        int[] nodeCounts = {12, 14, 16, 18, 20, 22, 24, 26};
+        int terminals = 10;
+        for (int nodes : nodeCounts) {
+            String name = "full_" + nodes;
+            Graph g = GraphGeneration.generateFullConnectedGraph(name, nodes);
+            SteinerGraph sg = new SteinerGraph(name, g, GraphGeneration.randomTerminalIds(terminals, nodes));
+            saveSteinerGraph(sg, name + ".stp");
+        }
+    }
+
+    private static void generateGridSteinerGraphs() {
+        int[] nodeCounts = {9, 16, 25, 36};
+        int terminals = 6;
+        for (int nodes : nodeCounts) {
+            String name = "grid_" + nodes;
+            Graph g = GraphGeneration.generateGridGraph(name, nodes);
+            SteinerGraph sg = new SteinerGraph(name, g, GraphGeneration.randomTerminalIds(terminals, nodes));
+            saveSteinerGraph(sg, name + ".stp");
+        }
     }
 
     public static void main(String[] args) {
-        runSimpleGraphTests(SteinerAlgorithmEnum.HAKIMI);
-//        runSimpleGraphTests(SteinerAlgorithmEnum.KMB);
+//        generateAndSaveFullConnectedSteinerGraphs();
+//        generateGridSteinerGraphs();
 
-//        String inputGraphFilename = "steinlib/E/e20.stp";
-//        String solutionOutputFilename = "e20_solved.stp";
+        runSimpleGraphTests(SteinerAlgorithmEnum.HAKIMI);
+        runSimpleGraphTests(SteinerAlgorithmEnum.KMB);
+
+        runGeneratedFullConnectedGraphTests(SteinerAlgorithmEnum.KMB);
+        runGeneratedGridGraphTests(SteinerAlgorithmEnum.KMB);
+
+        runSteinlibGraphTests(SteinerAlgorithmEnum.KMB);
+
+        runGeneratedFullConnectedGraphTests(SteinerAlgorithmEnum.HAKIMI);
+        runGeneratedGridGraphTests(SteinerAlgorithmEnum.HAKIMI);
+
+//        String inputGraphFilename = "test.stp";
+//        String solutionOutputFilename = "aaa.stp";
 //        SteinerAlgorithmEnum algorithm = SteinerAlgorithmEnum.KMB;
 //
 //        System.out.println("Loading graph and terminals from file: " + inputGraphFilename);
