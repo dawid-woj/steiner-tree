@@ -1,12 +1,14 @@
 package pl.edu.pw.elka.gis.steinar.algorithms;
 
+import lombok.NoArgsConstructor;
 import org.graphstream.graph.Edge;
 
 import java.util.List;
 
 /**
- * Created by dawid on 29.12.17.
+ * Implementacja algorytmu Prima.
  */
+@NoArgsConstructor
 public class Prim extends AbstractSpanningTreeAlgorithm {
 
     public int getMinimumSpanningTreeWeight() {

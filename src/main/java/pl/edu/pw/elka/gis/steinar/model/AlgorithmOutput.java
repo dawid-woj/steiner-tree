@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Klasa reprezentująca wynik działania algorytmu Hakimi / KMB.
+ */
 @Setter
 @Getter
 @AllArgsConstructor

@@ -13,6 +13,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Klasa zapisywania problemów (i ew. rozwiązań) minimalnego drzewa Steinera do plików STP.
+ */
 public class STPSaver {
     static private final String SECTION_FORMATTER = "SECTION %s";
     static private final String COMM_NAME_FORMATTER = "Name %s";
@@ -24,7 +27,8 @@ public class STPSaver {
     static private final String SOLUTION_ONE_FORMATTER = "S %s %s %d";
 
 
-    public static void save(String filename, SteinerGraph steinerGraph, SolutionMeasurement solutionMeasurement) throws FileNotFoundException {
+    public static void save(String filename, SteinerGraph steinerGraph, SolutionMeasurement solutionMeasurement)
+            throws FileNotFoundException {
         Collection<Node> nodeSet = steinerGraph.getNodes();
         HashMap<String, Edge> edgeHashMap = new HashMap<>();
 
@@ -48,12 +52,12 @@ public class STPSaver {
                 writer.println();
             }
 
-
             //Section Comment
             writer.println(String.format(SECTION_FORMATTER, "Comment"));
             writer.println(String.format(COMM_NAME_FORMATTER, steinerGraph.getName()));
             writer.println(STPCommons.END_SECTION);
             writer.println();
+
             //Section Graph
             writer.println(String.format(SECTION_FORMATTER, "Graph"));
             writer.println(String.format(GRAPH_NODES_FORMATTER, nodeSet.size()));
@@ -77,9 +81,9 @@ public class STPSaver {
             writer.println(STPCommons.END_SECTION);
             writer.println();
 
-            List<Edge> resultList = steinerGraph.getResultTreeEdges();
-
+            //Section Terminals
             if (solutionMeasurement != null) {
+                List<Edge> resultList = steinerGraph.getResultTreeEdges();
                 writer.println(String.format(SECTION_FORMATTER, "Solution"));
                 resultList.forEach(edge -> writer.println(String.format(SOLUTION_ONE_FORMATTER, edge.getNode0().getId(), edge.getNode1().getId(), edge.getAttribute(SteinerGraph.WEIGHT_ATTR, Integer.class))));
                 writer.println(STPCommons.END_SECTION);
@@ -94,7 +98,8 @@ public class STPSaver {
         } catch (FileNotFoundException e) {
             throw new FileNotFoundException(filename);
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace(); // Doesn't happened, because we have hardcoded UTF-8 coding
+            e.printStackTrace();
         }
     }
+
 }

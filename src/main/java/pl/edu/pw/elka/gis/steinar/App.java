@@ -12,7 +12,9 @@ import pl.edu.pw.elka.gis.steinar.model.*;
 import java.io.FileNotFoundException;
 import java.util.*;
 
-
+/**
+ * Główna klasa programu, stanowiąca moduł kontrolny aplikacji.
+ */
 public class App {
 
     private static final Map<SteinerAlgorithmEnum, AbstractMinimumSteinerTreeAlgorithm> steinerAlgorithms
@@ -22,10 +24,16 @@ public class App {
         steinerAlgorithms.put(SteinerAlgorithmEnum.KMB, new KMB());
     }
 
+    // Nazwy katalogów z grafami wejściowymi:
     public static final String RES_SIMPLE_GRAPHS_DIRNAME = "proste_grafy/";
     public static final String RES_STEINLIB_GRAPHS_DIRNAME = "steinlib/wybrane/";
     public static final String RES_GENERATED_GRAPHS_DIRNAME = "wygenerowane_grafy/";
+    // Nazwa katalogu dla wyników testów:
     public static final String RESULTS_DIRNAME = "rozwiazania/";
+
+    /**
+     * ************************* ODCZYT / ZAPIS GRAFÓW I WYNIKÓW ALGORYTMÓW *****************************
+     */
 
     private static SteinerGraph loadSteinerGraph(String filename) {
         try {
@@ -40,6 +48,28 @@ public class App {
         }
         return null;
     }
+
+    private static void saveSolution(AlgorithmOutput output, String filename) {
+        try {
+            STPSaver.save(filename, output.getGraph(), output.getMeasurement());
+        } catch (FileNotFoundException e) {
+            System.out.println("Exception occurred during STP file saving: " + e.getLocalizedMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private static void saveSteinerGraph(SteinerGraph graph, String filename) {
+        try {
+            STPSaver.save(filename, graph, null);
+        } catch (FileNotFoundException e) {
+            System.out.println("Exception occurred during STP file saving: " + e.getLocalizedMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * ********************** WYKONYWANIE ALGORYTMÓW KMB/HAKIMI I WIZUALIZACJA GRAFÓW **************************
+     */
 
     private static AlgorithmOutput findMinimalSteinerTree(SteinerGraph steinerGraph,
                                                          SteinerAlgorithmEnum steinerAlgorithm) {
@@ -83,23 +113,35 @@ public class App {
         DisplaySteinerGraph.showGraph(steinerGraph);
     }
 
-    private static void saveSolution(AlgorithmOutput output, String filename) {
-        try {
-            STPSaver.save(filename, output.getGraph(), output.getMeasurement());
-        } catch (FileNotFoundException e) {
-            System.out.println("Exception occurred during STP file saving: " + e.getLocalizedMessage());
-            e.printStackTrace();
+    /**
+     * ************************* GENERACJA GRAFÓW PEŁNYCH I KRAT DO TESTOWANIA *****************************
+     */
+
+    private static void generateAndSaveFullConnectedSteinerGraphs() {
+        int[] nodeCounts = {12, 14, 16, 18, 20, 22, 24, 26};
+        int terminals = 10;
+        for (int nodes : nodeCounts) {
+            String name = "full_" + nodes;
+            Graph g = GraphGeneration.generateFullConnectedGraph(name, nodes);
+            SteinerGraph sg = new SteinerGraph(name, g, GraphGeneration.randomTerminalIds(terminals, nodes));
+            saveSteinerGraph(sg, name + ".stp");
         }
     }
 
-    private static void saveSteinerGraph(SteinerGraph graph, String filename) {
-        try {
-            STPSaver.save(filename, graph, null);
-        } catch (FileNotFoundException e) {
-            System.out.println("Exception occurred during STP file saving: " + e.getLocalizedMessage());
-            e.printStackTrace();
+    private static void generateGridSteinerGraphs() {
+        int[] nodeCounts = {9, 16, 25, 36};
+        int terminals = 6;
+        for (int nodes : nodeCounts) {
+            String name = "grid_" + nodes;
+            Graph g = GraphGeneration.generateGridGraph(name, nodes);
+            SteinerGraph sg = new SteinerGraph(name, g, GraphGeneration.randomTerminalIds(terminals, nodes));
+            saveSteinerGraph(sg, name + ".stp");
         }
     }
+
+    /**
+     * ***************************** TESTOWANIE ALGORYTMÓW KMB/HAKIMI **********************************
+     */
 
     private static void runTests(CSVWriter resultsWriter, String inputGraphFilenamePrefix, String[] graphNames,
                                  int[] optimumWeights, SteinerAlgorithmEnum algoType) {
@@ -172,27 +214,9 @@ public class App {
         runTests(resultsWriter, RES_GENERATED_GRAPHS_DIRNAME, graphNames, null, algoType);
     }
 
-    private static void generateAndSaveFullConnectedSteinerGraphs() {
-        int[] nodeCounts = {12, 14, 16, 18, 20, 22, 24, 26};
-        int terminals = 10;
-        for (int nodes : nodeCounts) {
-            String name = "full_" + nodes;
-            Graph g = GraphGeneration.generateFullConnectedGraph(name, nodes);
-            SteinerGraph sg = new SteinerGraph(name, g, GraphGeneration.randomTerminalIds(terminals, nodes));
-            saveSteinerGraph(sg, name + ".stp");
-        }
-    }
-
-    private static void generateGridSteinerGraphs() {
-        int[] nodeCounts = {9, 16, 25, 36};
-        int terminals = 6;
-        for (int nodes : nodeCounts) {
-            String name = "grid_" + nodes;
-            Graph g = GraphGeneration.generateGridGraph(name, nodes);
-            SteinerGraph sg = new SteinerGraph(name, g, GraphGeneration.randomTerminalIds(terminals, nodes));
-            saveSteinerGraph(sg, name + ".stp");
-        }
-    }
+    /**
+     * ************************* METODA MAIN *****************************
+     */
 
     public static void main(String[] args) {
 //        generateAndSaveFullConnectedSteinerGraphs();

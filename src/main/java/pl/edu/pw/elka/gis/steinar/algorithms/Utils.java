@@ -9,7 +9,7 @@ import pl.edu.pw.elka.gis.steinar.model.SteinerGraph;
 import java.util.*;
 
 /**
- * Created by dawid on 31.12.17.
+ * Metody pomocnicze do przetwarzania grafów, etc.
  */
 public class Utils {
 
@@ -118,33 +118,6 @@ public class Utils {
     }
 
     /**
-     * Generowanie wszystkich podzbiorów danego zbioru węzłów grafu.
-     *
-     * @param nodes zbiór węzłów grafu
-     * @return      lista wszystkich podzbiorów danego zbioru węzłów
-     */
-    public static List<List<Node>> getNodeSubsets(List<Node> nodes) {
-        List<List<Node>> subsets = new ArrayList<>();
-        int subsetsCount = 1 << nodes.size();
-
-        for (int i = 0; i < subsetsCount; ++i) {
-            ArrayList<Node> subset = new ArrayList<>();
-            int mask = 1;
-
-            for (int k = 0; k < nodes.size(); ++k) {
-                if ((mask & i) != 0) {
-                    subset.add(nodes.get(k));
-                }
-                mask <<= 1;
-            }
-
-            subsets.add(subset);
-        }
-
-        return subsets;
-    }
-
-    /**
      * Generowanie podgrafu indukowanego na zadanym zbiorze węzłów grafu.
      *
      * @param graph graf
@@ -171,50 +144,6 @@ public class Utils {
             }
         }
 
-        return newGraph;
-    }
-
-    /**
-     * Zwraca graf (SingleGraph) jako rezultat usunięcia wszystkich węzłów terminalnych danego grafu steinera.
-     *
-     * @param steinerGraph  graf steinera
-     * @return              graf bez węzłów terminalnych (SingleGraph)
-     */
-    public static Graph getGraphWithRemovedTerminalNodes(SteinerGraph steinerGraph) {
-        Graph newGraph = new SingleGraph(steinerGraph.getGraph().getId() + "_induced", true, false,
-                steinerGraph.getNodeCount(), steinerGraph.getEdgeCount());
-
-        Collection<Node> nodes = steinerGraph.getNodes();
-
-        for (Node node : nodes) {
-            if (!steinerGraph.isTerminal(node)) {
-                addNodeWithAllAttributes(newGraph, node);
-            }
-        }
-
-        for (Node node : nodes) {
-            node.getEachEdge().forEach(edge -> {
-                Node n0 = edge.getNode0();
-                Node n1 = edge.getNode1();
-                if (newGraph.getNode(n0.getId()) != null && newGraph.getNode(n1.getId()) != null
-                        && newGraph.getEdge(edge.getId()) == null) {
-                    addEdgeWithAllAttributes(newGraph, edge, edge.getId(), n0.getId(), n1.getId());
-                }
-            });
-        }
-
-        return newGraph;
-    }
-
-    /**
-     * Zwraca graf steinera (SteinerGraph) jako rezultat usunięcia wszystkich węzłów terminalnych danego grafu steinera.
-     *
-     * @param steinerGraph  graf steinera
-     * @return              graf bez węzłów terminalnych (SteinerGraph)
-     */
-    public static SteinerGraph getSteinerGraphWithRemovedTerminalNodes(SteinerGraph steinerGraph) {
-        SteinerGraph newGraph = new SteinerGraph(steinerGraph);
-        newGraph.getTerminalNodeIds().forEach(newGraph::deleteNode);
         return newGraph;
     }
 

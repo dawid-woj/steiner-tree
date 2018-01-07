@@ -10,7 +10,9 @@ import pl.edu.pw.elka.gis.steinar.algorithms.Utils;
 
 import java.util.*;
 
-//FIXME: powyrzucac niepotrzebne/nieuzywane metody
+/**
+ * Klasa reprezentująca graf wejściowy programu wraz ze zbiorem terminali.
+ */
 public class SteinerGraph {
     private static int NEW_GRAPH_ID = 0;
 
@@ -150,15 +152,6 @@ public class SteinerGraph {
 
     public int getResultTreeEdgeCount() {
         return this.resultTreeEdges.size();
-    }
-
-    public boolean edgeIsResultTree(String idEdge) {
-        Edge edge = graph.getNode(idEdge);
-        Boolean result = false;
-        if(edge.hasAttribute(RESULT_TREE_ATTR)) {
-            result = edge.getAttribute(RESULT_TREE_ATTR, Boolean.class);
-        }
-        return result;
     }
 
     public void clearSolution() {

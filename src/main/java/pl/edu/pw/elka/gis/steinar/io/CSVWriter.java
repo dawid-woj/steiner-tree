@@ -8,7 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 
 /**
- * Created by dawid on 07.01.18.
+ * Prosta klasa zapisu wyników działania algorytmów KMB/Hakimi do plików CSV.
  */
 @RequiredArgsConstructor
 public class CSVWriter {

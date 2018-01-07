@@ -1,5 +1,6 @@
 package pl.edu.pw.elka.gis.steinar.io;
 
+import lombok.Getter;
 import org.graphstream.graph.Edge;
 import pl.edu.pw.elka.gis.steinar.io.exceptions.NotConsistentFileException;
 import pl.edu.pw.elka.gis.steinar.model.SteinerGraph;
@@ -13,6 +14,9 @@ import java.util.regex.Pattern;
 import static pl.edu.pw.elka.gis.steinar.io.STPCommons.END_SECTION;
 import static pl.edu.pw.elka.gis.steinar.io.STPCommons.STP_HEADER;
 
+/**
+ * Klasa odczytywania problemów minimalnego drzewa Steinera z plików STP.
+ */
 public class STPLoader {
     static private final Pattern SECTION_PATTERN = Pattern.compile("SECTION\\s+(\\w+)");
     static private final Pattern COMM_NAME_PATTERN = Pattern.compile("Name\\s+\"(.*)\"");
@@ -23,12 +27,10 @@ public class STPLoader {
     static private final Pattern TERMINAL_ONE_PATTERN = Pattern.compile("T\\s+(\\d+)");
     static private final Pattern SOLUTION_ONE_PATTERN = Pattern.compile("S\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)");
 
+    @Getter
     private final SteinerGraph resultGraph = new SteinerGraph();
-    private Scanner scanner;
 
-    public SteinerGraph getResultGraph() {
-        return resultGraph;
-    }
+    private Scanner scanner;
 
     public STPLoader(String filename) throws FileNotFoundException {
         ClassLoader classLoader = getClass().getClassLoader();
@@ -80,7 +82,7 @@ public class STPLoader {
     }
 
     private void loadResult() {
-        //Don't read result
+        // ignoruj sekcję Result:
         while (!readNextLine().equals(END_SECTION));
     }
 
@@ -197,4 +199,5 @@ public class STPLoader {
         }
         return scanner.nextLine();
     }
+
 }

@@ -6,8 +6,6 @@ import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import pl.edu.pw.elka.gis.steinar.algorithms.exceptions.HakimiTooBigGraphException;
 import pl.edu.pw.elka.gis.steinar.model.SteinerGraph;
-import scala.Int;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -15,6 +13,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Implementacja algorytmu dokładnego Hakimi.
+ */
 @NoArgsConstructor
 public class Hakimi extends AbstractMinimumSteinerTreeAlgorithm {
 
@@ -29,18 +30,16 @@ public class Hakimi extends AbstractMinimumSteinerTreeAlgorithm {
 
         List<Node> nonTerminals = Utils.getNonTerminalNodes(steinerGraph).stream().collect(Collectors.toList());
 
-        if(nonTerminals.size() >= 64)
-        {
+        if (nonTerminals.size() >= 64) {
             throw new HakimiTooBigGraphException();
         }
 
         long subsetsCount = 1l << nonTerminals.size();
 
         for (long i = 0; i < subsetsCount; ++i) {
-            //Wylicz wierzchołki znajdujace sie w podzbioerze
+            //Wylicz wierzchołki znajdujace sie w podzbiorze
             ArrayList<Node> nodeSubset = new ArrayList<>();
             long mask = 1;
-
             for (int k = 0; k < nonTerminals.size(); ++k) {
                 if ((mask & i) != 0) {
                     nodeSubset.add(nonTerminals.get(k));
@@ -48,13 +47,12 @@ public class Hakimi extends AbstractMinimumSteinerTreeAlgorithm {
                 mask <<= 1;
             }
 
-            //Oblicz minimalne drzewo oparte na nich
+            //Oblicz minimalne drzewo rozppinajace oparte na nich
             nodeSubset.addAll(terminalNodes);
             Graph graph = Utils.getInducedSubgraph(steinerGraph.getGraph(), nodeSubset);
             Prim MST = new Prim();
             MST.init(graph, terminalNodes.iterator().next().getId(), SteinerGraph.WEIGHT_ATTR, PRIM_RESULT_ATTR, PRIM_SOLUTION_ATTR);
             MST.compute();
-
             int MSTweight = MST.getMinimumSpanningTreeWeight();
 
             //Czy drzewo zostało znalezione
@@ -65,8 +63,8 @@ public class Hakimi extends AbstractMinimumSteinerTreeAlgorithm {
                 minWeight = MSTweight;
                 minTree = MST.getMinimumSpanningTreeEdges();
             }
-
         }
+
         steinerGraph.setResultTreeEdges(new HashSet<>(minTree));
     }
 }

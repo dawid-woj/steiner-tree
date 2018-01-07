@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by dawid on 29.12.17.
+ * Klasa bazowa algorytmów KMB i Hakimi do wyszukiwania minimalnego drzewa Steinera.
  */
 @NoArgsConstructor
 public abstract class AbstractMinimumSteinerTreeAlgorithm {

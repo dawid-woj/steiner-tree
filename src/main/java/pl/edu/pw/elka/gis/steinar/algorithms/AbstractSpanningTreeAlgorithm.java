@@ -12,7 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Created by dawid on 29.12.17.
+ * Klasa bazowa algorytmów Dijkstry i Prima.
  */
 @NoArgsConstructor
 public abstract class AbstractSpanningTreeAlgorithm {

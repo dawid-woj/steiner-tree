@@ -11,17 +11,32 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 /**
- * Created by dawid on 07.01.18.
+ * Metody automatycznej generacji grafów i losowych zbiorów terminali.
  */
 public class GraphGeneration {
 
+    /**
+     * Generuje losową listę identyfikatorów wierzchóków terminalnych.
+     *
+     * @param terminalsCount    liczba terminali do wylosowania
+     * @param nodesCount        liczba wszystkich wierzchołków grafu (maksymalna dopuszczalna wartość identyfikatora
+     *                          losowanego terminala)
+     * @return                  lista identyfikatorów terminali
+     */
     public static List<String> randomTerminalIds(int terminalsCount, int nodesCount) {
         return ThreadLocalRandom.current().ints(1, nodesCount+1)
                 .distinct().limit(terminalsCount).mapToObj(Integer::toString).collect(Collectors.toList());
     }
 
-    public static Graph generateFullConnectedGraph(String id, int nodeCount) {
-        Graph graph = new SingleGraph(id);
+    /**
+     * Generuje graf pełny o zadanej liczbie wierzchołków.
+     *
+     * @param graphId       identyfikator generowanego grafu
+     * @param nodeCount     liczba wierzchołków generowanego grafu
+     * @return              wygenerowany graf
+     */
+    public static Graph generateFullConnectedGraph(String graphId, int nodeCount) {
+        Graph graph = new SingleGraph(graphId);
 
         BaseGenerator gen = new FullGenerator() {
             @Override
@@ -97,6 +112,13 @@ public class GraphGeneration {
         return graph;
     }
 
+    /**
+     * Generuje regularną kratę o zadanej liczbie wierzchołków.
+     *
+     * @param graphId       identyfikator generowanego grafu
+     * @param nodeCount     liczba wierzchołków generowanego grafu (powinna być kwadratem liczby naturalnej)
+     * @return              wygenerowany graf
+     */
     public static Graph generateGridGraph(String graphId, int nodeCount) {
         Graph graph = new SingleGraph(graphId);
 

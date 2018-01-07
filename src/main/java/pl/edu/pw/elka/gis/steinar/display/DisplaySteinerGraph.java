@@ -1,6 +1,5 @@
 package pl.edu.pw.elka.gis.steinar.display;
 
-
 import lombok.Getter;
 import lombok.Setter;
 import org.graphstream.graph.Graph;
@@ -9,6 +8,9 @@ import pl.edu.pw.elka.gis.steinar.model.SteinerGraph;
 
 import static pl.edu.pw.elka.gis.steinar.model.SteinerGraph.*;
 
+/**
+ * Klasa wizualizacji grafów.
+ */
 public class DisplaySteinerGraph {
 
     static private DisplaySteinerGraph displaySteinerGraph;
@@ -32,14 +34,10 @@ public class DisplaySteinerGraph {
     @Setter
     private SteinerGraph graph;
 
-    private DisplaySteinerGraph() {
-
-    }
+    private DisplaySteinerGraph() {}
 
     private void display() {
         if (graph != null) {
-
-
             final Graph streamGraph = graph.getGraph();
 
             streamGraph.addAttribute("ui.stylesheet", styleSheet);
@@ -65,4 +63,5 @@ public class DisplaySteinerGraph {
         displaySteinerGraph.setGraph(graphToDisplay);
         displaySteinerGraph.display();
     }
+
 }
