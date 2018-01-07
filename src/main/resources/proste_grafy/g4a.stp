@@ -1,7 +1,7 @@
 33D32945 STP File, STP Format Version 1.0
 
 SECTION Comment
-Name    "Prosty graf 4"
+Name    "Prosty graf 4a"
 END
 
 SECTION Graph
@@ -25,9 +25,10 @@ E 7 8 2
 END
 
 SECTION Terminals
-Terminals 3
+Terminals 4
 T 1
 T 3
+T 5
 T 7
 END
 

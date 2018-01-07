@@ -14,13 +14,13 @@ public class DisplaySteinerGraph {
     static private DisplaySteinerGraph displaySteinerGraph;
     static private final String styleSheet =
             "edge {" +
-                    "	fill-color: black;" +
+                    "	fill-color: black; text-size: 15;" +
                     "}" +
                     "edge.solution {" +
                     "	fill-color: red;" +
                     "}" +
                     "node { " +
-                    " fill-color: black;" +
+                    " fill-color: black; text-style: bold; text-alignment: left; text-size: 18;" +
                     "}" +
                     "node.terminal { " +
                     "   fill-color: green;" +
@@ -53,6 +53,7 @@ public class DisplaySteinerGraph {
                     .stream()
                     .filter(node -> node.hasAttribute(TERMINAL_ATTR) && node.getAttribute(TERMINAL_ATTR, Boolean.class))
                     .forEach(node -> node.setAttribute("ui.class", "terminal"));
+            streamGraph.getNodeSet().forEach(node -> node.setAttribute("ui.label", node.getId()));
             viewer = streamGraph.display();
         }
     }

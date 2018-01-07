@@ -31,8 +31,11 @@ E 9 10 18
 END
 
 SECTION Terminals
-Terminals ???
-T ???
+Terminals 4
+T 1
+T 7
+T 9
+T 10
 END
 
 EOF

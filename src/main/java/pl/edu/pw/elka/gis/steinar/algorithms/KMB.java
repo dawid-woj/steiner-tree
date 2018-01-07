@@ -13,10 +13,7 @@ import pl.edu.pw.elka.gis.steinar.model.SteinerGraph;
 import scala.Int;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -66,7 +63,7 @@ public class KMB extends AbstractMinimumSteinerTreeAlgorithm
         //TODO Policz najkrotsze drogi miedzy wierzchołkam
         Set<String> terminalNodeIds = steinerGraph.getTerminalNodeIds();
         Set<Node> terminalNodes = steinerGraph.getNodes().stream().filter(n -> n.getAttribute(SteinerGraph.TERMINAL_ATTR, Boolean.class) == true).collect(Collectors.toSet());
-        Set<KMBRoad> kmbRoads = new HashSet<>();
+        Map<String, KMBRoad> kmbRoads = new HashMap<>();
 
         for (Node n1 : terminalNodes)
         {
@@ -92,14 +89,15 @@ public class KMB extends AbstractMinimumSteinerTreeAlgorithm
                     int length = edges.stream().mapToInt(e -> e.getAttribute(SteinerGraph.WEIGHT_ATTR, Integer.class)).sum();
 
                     KMBRoad kmbRoad = new KMBRoad(edges, name, length, n1, n2);
-                    kmbRoads.add(kmbRoad);
+                    kmbRoads.put(name, kmbRoad);
                 }
             }
+            dijkstra.clear();
         }
-        kmbRoads.stream().forEach(kmbRoad -> System.out.println(kmbRoad.getName() + " Dlugosc: " + kmbRoad.getLength()));
+        kmbRoads.values().forEach(kmbRoad -> System.out.println(kmbRoad.getName() + " Dlugosc: " + kmbRoad.getLength()));
         Graph graphD = new SingleGraph("KMB_GRAPH");
         graphD.setAutoCreate(true);
-        kmbRoads.stream().forEach(kmbRoad ->
+        kmbRoads.values().forEach(kmbRoad ->
         {
             String startId = kmbRoad.getNodeStart().getId(), endId = kmbRoad.getNodeEnd().getId();
             if (graphD.getNode(startId) == null)
@@ -115,11 +113,13 @@ public class KMB extends AbstractMinimumSteinerTreeAlgorithm
         });
 
         Prim prim = new Prim();
-        Node startNode = kmbRoads.iterator().next().getNodeStart();
+        Node startNode = kmbRoads.values().iterator().next().getNodeStart();
         prim.init(graphD, startNode.getId(), SteinerGraph.WEIGHT_ATTR, PRIM_RESULT_ATTR, PRIM_SOLUTION_ATTR);
         prim.compute();
+        List<Edge> primEdges = prim.getMinimumSpanningTreeEdges();
 
-        List<Edge> edges = prim.getMinimumSpanningTreeEdges();
+        Set<Edge> edges = new HashSet<>();
+        primEdges.forEach(edge -> edges.addAll(kmbRoads.get(edge.getId()).getEdgeList()));
         this.steinerGraph.setResultTreeEdges(edges);
 
 
