@@ -1,12 +1,9 @@
 package pl.edu.pw.elka.gis.steinar;
 
-import org.graphstream.graph.Edge;
-import org.graphstream.graph.Graph;
-import org.graphstream.graph.Node;
-import org.graphstream.graph.implementations.SingleGraph;
-import org.graphstream.ui.view.Viewer;
+import org.jfree.data.io.CSV;
 import pl.edu.pw.elka.gis.steinar.algorithms.*;
 import pl.edu.pw.elka.gis.steinar.display.DisplaySteinerGraph;
+import pl.edu.pw.elka.gis.steinar.io.CSVWriter;
 import pl.edu.pw.elka.gis.steinar.io.STPSaver;
 import pl.edu.pw.elka.gis.steinar.io.exceptions.NotConsistentFileException;
 import pl.edu.pw.elka.gis.steinar.io.STPLoader;
@@ -21,16 +18,19 @@ import java.util.*;
 
 public class App {
 
-    // ********************************** STEINER TREE ALGORITHM USAGE DEMO **************************************
-
-    public static final Map<SteinerAlgorithmEnum, AbstractMinimumSteinerTreeAlgorithm> steinerAlgorithms
+    private static final Map<SteinerAlgorithmEnum, AbstractMinimumSteinerTreeAlgorithm> steinerAlgorithms
             = new HashMap<>(2);
     static {
         steinerAlgorithms.put(SteinerAlgorithmEnum.HAKIMI, new Hakimi());
         steinerAlgorithms.put(SteinerAlgorithmEnum.KMB, new KMB());
     }
 
-    public static SteinerGraph loadSteinerGraph(String filename) {
+    public static final String RES_SIMPLE_GRAPHS_DIRNAME = "proste_grafy/";
+    public static final String RES_STEINLIB_GRAPHS_DIRNAME = "steinlib/wybrane/";
+    public static final String RES_GENERATED_GRAPHS_DIRNAME = "wygenerowane_grafy/";
+    public static final String RESULTS_DIRNAME = "rozwiazania/";
+
+    private static SteinerGraph loadSteinerGraph(String filename) {
         try {
             STPLoader stpLoader = new STPLoader(filename);
             return stpLoader.getResultGraph();
@@ -44,29 +44,29 @@ public class App {
         return null;
     }
 
-    public static AlgorithmOutput findMinimalSteinerTree(SteinerGraph steinerGraph,
+    private static AlgorithmOutput findMinimalSteinerTree(SteinerGraph steinerGraph,
                                                          SteinerAlgorithmEnum steinerAlgorithm) {
         AbstractMinimumSteinerTreeAlgorithm algorithm = steinerAlgorithms.get(steinerAlgorithm);
         algorithm.init(steinerGraph);
-        //TODO: timer start
+
+        long t = System.currentTimeMillis();
         algorithm.compute();
-        //TODO: timer stop
-        float time = 0; //TODO: wziac wartosc z timera
+        long td = System.currentTimeMillis() - t;
+
         SolutionMeasurement solution = new SolutionMeasurement(algorithm.getSteinerGraph().getResultTreeWeight(),
-                time, steinerAlgorithm);
+                (float)(td)/1000, steinerAlgorithm);
         return new AlgorithmOutput(solution, algorithm.getSteinerGraph());
     }
 
-    public static void printOutSolutionBasicInfo(AlgorithmOutput output) {
+    private static void printOutSolutionBasicInfo(AlgorithmOutput output) {
         String graphName = output.getGraph().getName();
         int graphNodeCount = output.getGraph().getNodeCount();
         int graphEdgeCount = output.getGraph().getEdgeCount();
         int terminalCount = output.getGraph().getTerminalCount();
 
-        float algorithmRunningTime = output.getMeasurement().getTime(); //FIXME: jakie jednostki?
+        float algorithmRunningTime = output.getMeasurement().getTime();
         String usedAlgorithmName = output.getMeasurement().getAlgorithm().toString();
 
-        int steinerTreeNodeCount = output.getGraph().getTerminalCount();
         int steinerTreeEdgeCount = output.getGraph().getResultTreeEdgeCount();
         int steinerTreeWeight = output.getMeasurement().getLength();
 
@@ -78,146 +78,100 @@ public class App {
         System.out.println("\nAlgorithm used: " + usedAlgorithmName);
         System.out.println("Running time [s]: " + algorithmRunningTime);
 
-        System.out.println("\nSteiner tree's node count: " + steinerTreeNodeCount);
         System.out.println("Steiner tree's edge count: " + steinerTreeEdgeCount);
         System.out.println("Steiner tree's weight: " + steinerTreeWeight);
     }
 
-    public static void showSteinerGraph(SteinerGraph steinerGraph) {
+    private static void showSteinerGraph(SteinerGraph steinerGraph) {
         DisplaySteinerGraph.showGraph(steinerGraph);
     }
 
-    public static void saveSolution(AlgorithmOutput output, String filename) {
+    private static void saveSolution(AlgorithmOutput output, String filename) {
         try {
             STPSaver.save(filename, output.getGraph(), output.getMeasurement());
         } catch (FileNotFoundException e) {
             System.out.println("Exception occurred during STP file saving: " + e.getLocalizedMessage());
+            e.printStackTrace();
         }
     }
 
-    // ************************************* PRIM/DIJKSTRA TEST *********************************************
+    private static void runTests(CSVWriter resultsWriter, String inputGraphFilenamePrefix, String[] graphNames,
+                                 SteinerAlgorithmEnum algoType) {
+        for (String name : graphNames) {
+            String inputFilename = inputGraphFilenamePrefix + name + ".stp";
+            String outputFilename = RESULTS_DIRNAME + name + "_" + algoType + ".stp";
 
-    //TODO: do testow/demo - do usuniecia
-    public static Graph exampleGraph() {
-        Graph g = new SingleGraph("example");
-        g.addNode("A").addAttribute("xy", 0, 1);
-        g.addNode("B").addAttribute("xy", 1, 2);
-        g.addNode("C").addAttribute("xy", 1, 1);
-        g.addNode("D").addAttribute("xy", 1, 0);
-        g.addNode("E").addAttribute("xy", 2, 2);
-        g.addNode("F").addAttribute("xy", 2, 1);
-        g.addEdge("A:B", "A", "B").addAttribute("length", 14);
-        g.addEdge("A:C", "A", "C").addAttribute("length", 9);
-        g.addEdge("A:D", "A", "D").addAttribute("length", 7);
-        g.addEdge("B:C", "B", "C").addAttribute("length", 2);
-        g.addEdge("C:D", "C", "D").addAttribute("length", 10);
-        g.addEdge("B:E", "B", "E").addAttribute("length", 9);
-        g.addEdge("C:F", "C", "F").addAttribute("length", 11);
-        g.addEdge("D:F", "D", "F").addAttribute("length", 15);
-        g.addEdge("E:F", "E", "F").addAttribute("length", 6);
-        for (Node n : g)
-            n.addAttribute("label", n.getId());
-        for (Edge e : g.getEachEdge())
-            e.addAttribute("label", "" + (int) e.getNumber("length"));
-        return g;
-    }
+            System.out.println("Loading graph and terminals from file: " + inputFilename);
+            SteinerGraph steinerGraph = loadSteinerGraph(inputFilename);
 
-    //TODO: demko korzystania z dijkstry - do usuniecia
-    public static void dijkstraTest() {
-        Graph g = exampleGraph();
-        g.display(false);
+            if (steinerGraph != null) {
+                System.out.println("   Starting algorithm " + algoType + "...");
+                AlgorithmOutput output = findMinimalSteinerTree(steinerGraph, algoType);
+                System.out.println("   ...done. Time [s]: " + output.getMeasurement().getTime());
 
-        Dijkstra algo = new Dijkstra();
-        algo.init(g, "A", "length", "result", "solution");
-        algo.compute();
+                System.out.println("   Saving solution to file: " + outputFilename);
+                saveSolution(output, outputFilename);
 
-        List<String> targetNodes = Arrays.asList("B", "C", "D", "E", "F");
-        for (String nodeId : targetNodes) {
-            Node targetNode = g.getNode(nodeId);
-
-            System.out.println("path to " + nodeId + ":");
-            System.out.println("   weight: " + algo.getShortestPathWeight(targetNode));
-
-            System.out.print("   nodes: ");
-            List<Node> nodes = algo.getShortestPathNodes(targetNode);
-            ListIterator<Node> li = nodes.listIterator(nodes.size());
-            while (li.hasPrevious()) {
-                System.out.print(li.previous().getId() + " -> ");
+                System.out.println("   Appending solution info to results file...");
+                resultsWriter.append(output);
+            } else {
+                System.out.println("SteinerGraph is null!");
+                return;
             }
-            System.out.println();
-
-            System.out.print("   edges: ");
-            List<Edge> edges = algo.getShortestPathEdges(targetNode);
-            ListIterator<Edge> lii = edges.listIterator(edges.size());
-            while (lii.hasPrevious()) {
-                System.out.print(lii.previous().getId() + ", ");
-            }
-            System.out.println();
-        }
-        algo.clear();
-    }
-
-    //TODO: demko korzystania z prima - do usuniecia
-    public static void primTest() {
-        Graph g = exampleGraph();
-        String styleSheet =
-                "edge { fill-color: black; } " +
-                "node { fill-color: black; } " +
-                "edge.solution { fill-color: red; size: 3px; }";
-        g.addAttribute("ui.stylesheet", styleSheet);
-        Viewer view = g.display(false);
-        try { Thread.sleep(2000); } catch (Exception e) {}
-        view.close();
-
-        Prim algo = new Prim();
-        algo.init(g, "A", "length", "result", "solution");
-
-        List<String> targetNodes = Arrays.asList("A", "B", "C", "D", "E", "F");
-        for (String nodeId : targetNodes) {
-            algo.setStart(g.getNode(nodeId));
-            algo.compute();
-
-            System.out.println("MST starting from node " + nodeId + ": ");
-            System.out.println("   weight: " + algo.getMinimumSpanningTreeWeight());
-            System.out.print("   edges: ");
-            for (Edge edge : algo.getMinimumSpanningTreeEdges()) {
-                System.out.print(edge + ", ");
-            }
-            System.out.println();
-
-            g.getEdgeSet().stream()
-                    .filter(edge -> edge.hasAttribute("solution") && edge.getAttribute("solution", Boolean.class))
-                    .forEach(edge -> edge.setAttribute("ui.class", "solution"));
-            view = g.display(false);
-            try { Thread.sleep(2000); } catch (Exception e) {}
-            view.close();
-
-            algo.clear();
         }
     }
 
-    // ***************************************************************************************************
+    private static void runSimpleGraphTests(SteinerAlgorithmEnum algoType) {
+        String[] graphNames = {"g1b", "g1d", "g2a", "g2b", "g2c", "g3a", "g3b", "g4a", "g4b", "g5"};
+
+        CSVWriter resultsWriter = new CSVWriter(RESULTS_DIRNAME + "proste_grafy_wyniki_" + algoType + ".csv");
+        resultsWriter.deleteFileIfExists();
+        resultsWriter.writeHeader();
+
+        runTests(resultsWriter, RES_SIMPLE_GRAPHS_DIRNAME, graphNames, algoType);
+    }
+
+    private static void runSteinlibGraphTests(SteinerAlgorithmEnum algoType) {
+        String[] graphNames = {/*TODO*/};
+
+        CSVWriter resultsWriter = new CSVWriter(RESULTS_DIRNAME + "steinlib_wyniki_" + algoType + ".csv");
+        resultsWriter.deleteFileIfExists();
+        resultsWriter.writeHeader();
+
+        runTests(resultsWriter, RES_STEINLIB_GRAPHS_DIRNAME, graphNames, algoType);
+    }
+
+    private static void runGeneratedGraphTests(SteinerAlgorithmEnum algoType) {
+        String[] graphNames = {/*TODO*/};
+
+        CSVWriter resultsWriter = new CSVWriter(RESULTS_DIRNAME + "wygenerowane_grafy_wyniki_" + algoType + ".csv");
+        resultsWriter.deleteFileIfExists();
+        resultsWriter.writeHeader();
+
+        runTests(resultsWriter, RES_GENERATED_GRAPHS_DIRNAME, graphNames, algoType);
+    }
 
     public static void main(String[] args) {
-        String inputGraphFilename = "proste_grafy/g1.stp";
-        String solutionOutputFilename = "g1_solved.stp";
-        SteinerAlgorithmEnum algorithm = SteinerAlgorithmEnum.HAKIMI;
+        runSimpleGraphTests(SteinerAlgorithmEnum.HAKIMI);
+//        runSimpleGraphTests(SteinerAlgorithmEnum.KMB);
 
-        System.out.println("Loading graph and terminals from file: " + inputGraphFilename);
-        SteinerGraph steinerGraph = loadSteinerGraph(inputGraphFilename);
-        if (steinerGraph != null) {
-//            System.out.println("Visualising loaded graph and terminals...");
-//            showSteinerGraph(steinerGraph);
-            System.out.println("Starting algorithm " + algorithm + "...");
-            AlgorithmOutput output = findMinimalSteinerTree(steinerGraph, algorithm);
-            System.out.println("...done.");
-            printOutSolutionBasicInfo(output);
-            System.out.println("Visualising graph with found minimal steiner tree...");
-            showSteinerGraph(output.getGraph());
-            System.out.println("Saving solution to file: " + solutionOutputFilename);
-            saveSolution(output, solutionOutputFilename);
-        }
-        System.out.println("FINISHED");
+//        String inputGraphFilename = "steinlib/E/e20.stp";
+//        String solutionOutputFilename = "e20_solved.stp";
+//        SteinerAlgorithmEnum algorithm = SteinerAlgorithmEnum.KMB;
+//
+//        System.out.println("Loading graph and terminals from file: " + inputGraphFilename);
+//        SteinerGraph steinerGraph = loadSteinerGraph(inputGraphFilename);
+//        if (steinerGraph != null) {
+//            System.out.println("Starting algorithm " + algorithm + "...");
+//            AlgorithmOutput output = findMinimalSteinerTree(steinerGraph, algorithm);
+//            System.out.println("...done.");
+//            printOutSolutionBasicInfo(output);
+//            System.out.println("Visualising graph with found minimal steiner tree...");
+//            showSteinerGraph(output.getGraph());
+//            System.out.println("Saving solution to file: " + solutionOutputFilename);
+//            saveSolution(output, solutionOutputFilename);
+//        }
+//        System.out.println("FINISHED");
     }
 
 }

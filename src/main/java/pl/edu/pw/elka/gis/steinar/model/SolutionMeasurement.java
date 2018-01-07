@@ -9,6 +9,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class SolutionMeasurement {
     private int length;
-    private float time;
+    private float time; // s
     private SteinerAlgorithmEnum algorithm;
 }
