@@ -1,0 +1,5 @@
+Nazwa grafu,Liczba wierzchołków,Liczba krawędzi,Liczba terminali,Czas wykonania [s],Optymalny koszt drzewa,Koszt drzewa
+grid_9,9,12,6,3.3333336E-4,null,43,
+grid_16,16,24,6,0.0016666668,null,40,
+grid_25,25,40,6,0.0016666668,null,86,
+grid_36,36,60,6,0.001,null,84,

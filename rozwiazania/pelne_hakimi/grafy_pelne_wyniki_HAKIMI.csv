@@ -1,0 +1,11 @@
+Nazwa grafu,Liczba wierzchołków,Liczba krawędzi,Liczba terminali,Czas wykonania [s],Optymalny koszt drzewa,Koszt drzewa
+full_12,12,66,10,0.08733333,null,20,
+null,14,91,10,0.026333332,null,37,
+full_16,16,120,10,0.067,null,21,
+full_18,18,153,10,0.144,null,30,
+full_20,20,190,10,0.32666668,null,19,
+full_22,22,231,10,0.6246667,null,22,
+full_24,24,276,10,2.1943333,null,20,
+full_26,26,325,10,9.868,null,23,
+full_28,28,378,10,45.010334,null,15,
+full_30,30,435,10,196.65569,null,13,

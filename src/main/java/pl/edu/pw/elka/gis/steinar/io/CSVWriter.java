@@ -40,7 +40,7 @@ public class CSVWriter {
         appendContent(HEADER + System.lineSeparator());
     }
 
-    public void append(AlgorithmOutput output, int optimumWeight) {
+    public void append(AlgorithmOutput output, Integer optimumWeight) {
         String graphName = output.getGraph().getName();
         int graphNodeCount = output.getGraph().getNodeCount();
         int graphEdgeCount = output.getGraph().getEdgeCount();

@@ -1,0 +1,11 @@
+Nazwa grafu,Liczba wierzchołków,Liczba krawędzi,Liczba terminali,Czas wykonania [s],Optymalny koszt drzewa,Koszt drzewa
+Prosty graf 1b,5,6,3,0.0053333337,5,5,
+Prosty graf 1d,5,6,3,0.0013333334,7,7,
+Prosty graf 2a,8,11,3,0.001,14,14,
+Prosty graf 2b,8,11,3,0.0036666666,13,13,
+Prosty graf 2c,8,11,3,0.001,16,16,
+Prosty graf 3a,8,13,5,0.0013333334,14,14,
+Prosty graf 3b,8,13,3,0.001,6,6,
+Prosty graf 4a,8,15,4,3.3333336E-4,8,9,
+Prosty graf 4b,8,15,3,3.3333336E-4,7,7,
+Prosty graf 5,10,21,4,0.0013333334,28,28,

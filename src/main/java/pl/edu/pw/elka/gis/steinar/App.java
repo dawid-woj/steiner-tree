@@ -118,7 +118,8 @@ public class App {
      */
 
     private static void generateAndSaveFullConnectedSteinerGraphs() {
-        int[] nodeCounts = {12, 14, 16, 18, 20, 22, 24, 26};
+        //int[] nodeCounts = {12, 14, 16, 18, 20, 22, 24, 26};
+        int[] nodeCounts = {28, 30, 32, 34, 36};
         int terminals = 10;
         for (int nodes : nodeCounts) {
             String name = "full_" + nodes;
@@ -128,7 +129,7 @@ public class App {
         }
     }
 
-    private static void generateGridSteinerGraphs() {
+    private static void generateAndSaveGridSteinerGraphs() {
         int[] nodeCounts = {9, 16, 25, 36};
         int terminals = 6;
         for (int nodes : nodeCounts) {
@@ -154,15 +155,31 @@ public class App {
             SteinerGraph steinerGraph = loadSteinerGraph(inputFilename);
 
             if (steinerGraph != null) {
-                System.out.println("   Starting algorithm " + algoType + "...");
-                AlgorithmOutput output = findMinimalSteinerTree(steinerGraph, algoType);
-                System.out.println("   ...done. Time [s]: " + output.getMeasurement().getTime());
+                AlgorithmOutput output = new AlgorithmOutput();
+
+                int max = 3;
+                float avgTime = 0f;
+                for (int k = 1; k <= max; ++k) {
+                    System.out.println("   Starting algorithm " + algoType + "(" + k + "/" + max + ")...");
+                    output = findMinimalSteinerTree(steinerGraph, algoType);
+                    avgTime += output.getMeasurement().getTime();
+                    System.out.println("   ...done. Time [s]: " + output.getMeasurement().getTime());
+                    if (k < max) {
+                        steinerGraph.clearSolution();
+                    }
+                }
+                avgTime /= max;
+                output.getMeasurement().setTime(avgTime);
 
                 System.out.println("   Saving solution to file: " + outputFilename);
                 saveSolution(output, outputFilename);
 
                 System.out.println("   Appending solution info to results file...");
-                resultsWriter.append(output, optimumWeights[i++]);
+                if (optimumWeights != null) {
+                    resultsWriter.append(output, optimumWeights[i++]);
+                } else {
+                    resultsWriter.append(output, null);
+                }
             } else {
                 System.out.println("SteinerGraph is null!");
                 return;
@@ -183,9 +200,9 @@ public class App {
 
     private static void runSteinlibGraphTests(SteinerAlgorithmEnum algoType) {
         String[] graphNames = {"b05", "b06", "b10", "b11", "b18", "c11", "c12", "c13", "c14", "c15", "c19", "c20",
-                "d19", "d20", "e06", "mc2", "mc3", "p455", "p457", "p459", "p461", "p463", "p464", "p465", "p466"};
+                "d19", "d20", "e06", "p455", "p457", "p459", "p461", "p463", "p464", "p465", "p466"};
         int[] optimumWeights = {61, 122, 86, 88, 218, 32, 46, 258, 323, 556, 146, 267,
-                310, 537, 73, 71, 47, 1138, 1609, 2345, 4474, 1510, 2545, 3853, 6234};
+                310, 537, 73, 1138, 1609, 2345, 4474, 1510, 2545, 3853, 6234};
 
         CSVWriter resultsWriter = new CSVWriter(RESULTS_DIRNAME + "steinlib_wyniki_" + algoType + ".csv");
         resultsWriter.deleteFileIfExists();
@@ -195,7 +212,8 @@ public class App {
     }
 
     private static void runGeneratedFullConnectedGraphTests(SteinerAlgorithmEnum algoType) {
-        String[] graphNames = {"full_12", "full_14", "full_16", "full_18", "full_20", "full_22", "full_24", "full_26"};
+        String[] graphNames = {"full_12", "full_14", "full_16", "full_18", "full_20", "full_22", "full_24", "full_26",
+        "full_28", "full_30", "full_32", "full_34", "full_36"};
 
         CSVWriter resultsWriter = new CSVWriter(RESULTS_DIRNAME + "grafy_pelne_wyniki_" + algoType + ".csv");
         resultsWriter.deleteFileIfExists();
@@ -220,7 +238,7 @@ public class App {
 
     public static void main(String[] args) {
 //        generateAndSaveFullConnectedSteinerGraphs();
-//        generateGridSteinerGraphs();
+//        generateAndSaveGridSteinerGraphs();
 
         runSimpleGraphTests(SteinerAlgorithmEnum.HAKIMI);
         runSimpleGraphTests(SteinerAlgorithmEnum.KMB);

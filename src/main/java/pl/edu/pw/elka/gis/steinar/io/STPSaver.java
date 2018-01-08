@@ -54,7 +54,7 @@ public class STPSaver {
 
             //Section Comment
             writer.println(String.format(SECTION_FORMATTER, "Comment"));
-            writer.println(String.format(COMM_NAME_FORMATTER, steinerGraph.getName()));
+            writer.println(String.format(COMM_NAME_FORMATTER, "\"" + steinerGraph.getName()) + "\"");
             writer.println(STPCommons.END_SECTION);
             writer.println();
 

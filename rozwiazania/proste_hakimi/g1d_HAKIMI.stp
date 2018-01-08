@@ -1,0 +1,37 @@
+33D32945 STP File, STP Format Version 1.0
+
+SECTION Result
+Length 7
+Time 0,003333
+Algorithm HAKIMI
+END
+
+SECTION Comment
+Name "Prosty graf 1d"
+END
+
+SECTION Graph
+Nodes 5
+Edges 6
+E 1 2 3
+E 2 3 7
+E 1 5 2
+E 2 4 4
+E 3 4 1
+E 4 5 2
+END
+
+SECTION Terminals
+Terminals 3
+T 2
+T 3
+T 5
+END
+
+SECTION Solution
+S 2 4 4
+S 3 4 1
+S 4 5 2
+END
+
+EOF
